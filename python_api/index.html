@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; background: #f4f4f4; }
+        .job-card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; text-align: center; }
+        .btn { background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>NJP Job Portal</h1>
+    <div id="job-list">Loading jobs...</div>
+
+    <script>
+        // API se jobs fetch karne ka function
+        async function fetchJobs() {
+            try {
+                const response = await fetch('/api/jobs');
+                const jobs = await response.json();
+                const container = document.getElementById('job-list');
+                container.innerHTML = '';
+
+                if (jobs.length === 0) {
+                    container.innerHTML = '<p>No jobs found. Add some via API!</p>';
+                    return;
+                }
+
+                jobs.forEach(job => {
+                    container.innerHTML += `
+                        <div class="job-card">
+                            <h3>${job.title}</h3>
+                            <p><strong>Company:</strong> ${job.company} | <strong>Location:</strong> ${job.location}</p>
+                            <p>${job.description}</p>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                document.getElementById('job-list').innerText = 'Error loading jobs.';
+            }
+        }
+        fetchJobs();
+    </script>
+</body>
+</html>
