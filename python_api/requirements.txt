@@ -1,5 +1,5 @@
-flask
-flask-sqlalchemy
-flask-cors
-gunicorn
+Flask
+Flask-SQLAlchemy
 psycopg2-binary
+gunicorn
+Flask-CORS
