@@ -15,6 +15,8 @@ if database_url and database_url.startswith("postgres://"):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Use pool_pre_ping to avoid errors with stale/closed connections on some hosts
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}
 
 db = SQLAlchemy(app)
 
@@ -60,9 +62,12 @@ class Application(db.Model):
             "applied_at": self.applied_at.isoformat()
         }
 
-# Create database tables
-with app.app_context():
-    db.create_all()
+# Create database tables (tolerant to DB connectivity issues)
+try:
+    with app.app_context():
+        db.create_all()
+except Exception as e:
+    app.logger.error("Database initialization failed: %s", e)
 
 # --- Routes ---
 @app.route('/', methods=['GET'])
