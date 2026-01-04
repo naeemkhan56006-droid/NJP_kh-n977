@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
 import threading
+from sqlalchemy import text
 
 app = Flask(__name__)
 CORS(app)
@@ -77,6 +78,15 @@ threading.Thread(target=init_db, daemon=True).start()
 @app.route('/', methods=['GET'])
 def health_check():
     return jsonify({"status": "active", "message": "Job Portal API is running"}), 200
+
+@app.route('/db-check', methods=['GET'])
+def db_check():
+    try:
+        db.session.execute(text('SELECT 1'))
+        return jsonify({"db": "DB Connected"}), 200
+    except Exception as e:
+        app.logger.error("DB check failed: %s", e)
+        return jsonify({"db": "DB Error", "error": str(e)}), 500
 
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
