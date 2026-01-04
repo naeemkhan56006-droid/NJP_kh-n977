@@ -3,30 +3,27 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime, timezone
-import threading
-from sqlalchemy import text
 
 app = Flask(__name__)
 CORS(app)
 
-# Database Configuration
-database_url = os.environ.get('DATABASE_URL', 'sqlite:///jobs.db')
-if database_url and database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+# Database Configuration (PostgreSQL Support)
+db_uri = os.environ.get('DATABASE_URL')
+if db_uri and db_uri.startswith("postgres://"):
+    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri or 'sqlite:///jobs.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- Models ---
+# Database Models
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     company = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
     location = db.Column(db.String(100))
     posted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    apps = db.relationship('Application', backref='job', lazy=True, cascade="all, delete-orphan")
+    applications = db.relationship('Application', backref='job', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {"id": self.id, "title": self.title, "company": self.company, "location": self.location}
@@ -34,24 +31,17 @@ class Job(db.Model):
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
-    applicant_name = db.Column(db.String(100), nullable=False)
-    applicant_email = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.String(20), default='Pending')
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
     applied_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
-        return {
-            "applicant_name": self.applicant_name,
-            "applicant_email": self.applicant_email,
-            "job_id": self.job_id,
-            "status": self.status,
-            "applied_at": self.applied_at.isoformat()
-        }
+        return {"name": self.name, "email": self.email, "job_id": self.job_id}
 
 with app.app_context():
     db.create_all()
 
-# --- Routes ---
+# Routes
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -60,7 +50,7 @@ def index():
 def handle_jobs():
     if request.method == 'POST':
         data = request.get_json()
-        new_job = Job(title=data['title'], company=data['company'], location=data.get('location'), description=data.get('description'))
+        new_job = Job(title=data['title'], company=data['company'], location=data.get('location'))
         db.session.add(new_job)
         db.session.commit()
         return jsonify(new_job.to_dict()), 201
@@ -70,10 +60,10 @@ def handle_jobs():
 @app.route('/api/jobs/<int:id>/apply', methods=['POST'])
 def apply(id):
     data = request.get_json()
-    new_app = Application(job_id=id, applicant_name=data['applicant_name'], applicant_email=data['applicant_email'])
+    new_app = Application(job_id=id, name=data['name'], email=data['email'])
     db.session.add(new_app)
     db.session.commit()
-    return jsonify(new_app.to_dict()), 201
+    return jsonify({"message": "Success"}), 201
 
 @app.route('/api/applications', methods=['GET'])
 def get_apps():
