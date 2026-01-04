@@ -3,97 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NJP Job Portal - Admin</title>
+    <title>NJP Job Portal - Full Access</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: auto; padding: 20px; background: #f8f9fa; }
-        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .section { padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 25px; }
-        h1, h2 { color: #1a73e8; }
-        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; }
+        body { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: auto; padding: 20px; background: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1, h2 { color: #1a73e8; text-align: center; }
+        .section { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 30px; }
+        input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .btn { background: #1a73e8; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; }
-        .btn-green { background: #28a745; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .btn:hover { background: #1557b0; }
+        .job-card { background: #fff; padding: 20px; border-left: 5px solid #1a73e8; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .apply-box { background: #f9f9f9; padding: 15px; margin-top: 10px; border-radius: 6px; display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        th { background: #f1f3f4; }
-        .job-card { background: #fff; padding: 15px; border-left: 5px solid #1a73e8; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        th { background: #f8f9fa; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>NJP Job Portal Admin</h1>
 
-        <div class="section">
-            <h2>Post a New Job</h2>
-            <input type="text" id="title" placeholder="Job Title">
-            <input type="text" id="company" placeholder="Company Name">
-            <input type="text" id="location" placeholder="Location">
-            <textarea id="description" rows="3" placeholder="Description"></textarea>
-            <button class="btn" onclick="postJob()">🚀 Publish Job</button>
-        </div>
+<div class="container">
+    <h1>NJP Job Portal</h1>
 
-        <div class="section">
-            <h2>Current Openings</h2>
-            <div id="job-list">Loading...</div>
-        </div>
-
-        <div class="section" style="border-top: 4px solid #28a745;">
-            <h2>Received Applications</h2>
-            <button class="btn btn-green" onclick="fetchApplications()">🔄 Refresh List</button>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Job ID</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="app-list">
-                        <tr><td colspan="4" style="text-align:center;">No data yet.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="section">
+        <h2>Post a New Job</h2>
+        <input type="text" id="title" placeholder="Job Title">
+        <input type="text" id="company" placeholder="Company Name">
+        <input type="text" id="location" placeholder="Location">
+        <textarea id="description" rows="2" placeholder="Job Description"></textarea>
+        <button class="btn" onclick="postJob()">🚀 Publish Job</button>
     </div>
 
-    <script>
-        async function fetchJobs() {
-            const res = await fetch('/api/jobs');
-            const jobs = await res.json();
-            const list = document.getElementById('job-list');
-            list.innerHTML = jobs.length ? '' : 'No jobs found.';
-            jobs.forEach(j => {
-                list.innerHTML += `<div class="job-card"><strong>#${j.id}</strong> - ${j.title} at ${j.company}</div>`;
-            });
-        }
+    <div class="section">
+        <h2>Current Job Openings</h2>
+        <div id="job-list">Loading jobs...</div>
+    </div>
 
-        async function postJob() {
-            const data = {
-                title: document.getElementById('title').value,
-                company: document.getElementById('company').value,
-                location: document.getElementById('location').value,
-                description: document.getElementById('description').value
-            };
-            await fetch('/api/jobs', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            alert("Job Posted!");
-            fetchJobs();
-        }
+    <div class="section" style="border-top: 4px solid #34a853;">
+        <h2>Admin: Received Applications</h2>
+        <button class="btn" style="background: #34a853; margin-bottom:10px;" onclick="fetchApplications()">🔄 Refresh Applications</button>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Job ID</th><th>Status</th></tr>
+                </thead>
+                <tbody id="app-list">
+                    <tr><td colspan="4" style="text-align:center;">No applications yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-        async function fetchApplications() {
-            const res = await fetch('/api/applications');
-            const apps = await res.json();
-            const list = document.getElementById('app-list');
-            list.innerHTML = apps.length ? '' : '<tr><td colspan="4">No applications.</td></tr>';
-            apps.forEach(a => {
-                list.innerHTML += `<tr><td>${a.applicant_name}</td><td>${a.applicant_email}</td><td>#${a.job_id}</td><td>${a.status}</td></tr>`;
-            });
+<script>
+    // Fetch and display jobs
+    async function fetchJobs() {
+        const res = await fetch('/api/jobs');
+        const jobs = await res.json();
+        const list = document.getElementById('job-list');
+        list.innerHTML = jobs.length ? '' : 'No jobs found.';
+        jobs.forEach(j => {
+            list.innerHTML += `
+                <div class="job-card">
+                    <h3>${j.title}</h3>
+                    <p><strong>${j.company}</strong> | 📍 ${j.location}</p>
+                    <button class="btn" style="width:auto;" onclick="toggleApply(${j.id})">Apply Now</button>
+                    <div id="apply-form-${j.id}" class="apply-box">
+                        <input type="text" id="name-${j.id}" placeholder="Your Name">
+                        <input type="email" id="email-${j.id}" placeholder="Your Email">
+                        <button class="btn" style="background:#34a853;" onclick="submitApplication(${j.id})">Submit Application</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // Toggle Apply Form
+    function toggleApply(id) {
+        const form = document.getElementById(`apply-form-${id}`);
+        form.style.display = form.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Submit Application
+    async function submitApplication(jobId) {
+        const data = {
+            applicant_name: document.getElementById(`name-${jobId}`).value,
+            applicant_email: document.getElementById(`email-${jobId}`).value
+        };
+        const res = await fetch(`/api/jobs/${jobId}/apply`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        if(res.ok) {
+            alert("Application Sent Successfully!");
+            toggleApply(jobId);
         }
+    }
+
+    // Post Job
+    async function postJob() {
+        const data = {
+            title: document.getElementById('title').value,
+            company: document.getElementById('company').value,
+            location: document.getElementById('location').value,
+            description: document.getElementById('description').value
+        };
+        await fetch('/api/jobs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        alert("Job Posted!");
         fetchJobs();
-    </script>
+    }
+
+    // Fetch Applications for Admin
+    async function fetchApplications() {
+        const res = await fetch('/api/applications');
+        const apps = await res.json();
+        const list = document.getElementById('app-list');
+        list.innerHTML = '';
+        apps.forEach(a => {
+            list.innerHTML += `<tr><td>${a.applicant_name}</td><td>${a.applicant_email}</td><td>#${a.job_id}</td><td>${a.status}</td></tr>`;
+        });
+    }
+
+    fetchJobs();
+</script>
 </body>
 </html>
