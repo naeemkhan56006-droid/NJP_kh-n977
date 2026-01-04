@@ -11,7 +11,6 @@ app = Flask(__name__)
 CORS(app)
 
 # --- Database Configuration ---
-# Render/Postgres setup ke liye database_url ko adjust karna zaroori hai
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///jobs.db')
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -31,7 +30,6 @@ class Job(db.Model):
     location = db.Column(db.String(100), nullable=True)
     salary = db.Column(db.String(50), nullable=True)
     posted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    # Cascade delete ka matlab hai job delete hui to applications bhi delete ho jayengi
     applications = db.relationship('Application', backref='job', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
@@ -65,7 +63,7 @@ class Application(db.Model):
             "applied_at": self.applied_at.isoformat()
         }
 
-# --- Database Initialization (Background Thread) ---
+# --- Database Initialization ---
 def init_db():
     try:
         with app.app_context():
@@ -78,13 +76,10 @@ threading.Thread(target=init_db, daemon=True).start()
 
 # --- Routes (Endpoints) ---
 
-# 1. Frontend Route (Jo index.html dikhayega)
 @app.route('/', methods=['GET'])
 def index():
-    # Yeh aapke python_api folder ke andar index.html dhoondega
     return send_from_directory('.', 'index.html')
 
-# 2. API Health & DB Check
 @app.route('/db-check', methods=['GET'])
 def db_check():
     try:
@@ -93,7 +88,6 @@ def db_check():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# 3. Get All Jobs
 @app.route('/api/jobs', methods=['GET'])
 def get_jobs():
     try:
@@ -102,13 +96,11 @@ def get_jobs():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# 4. Create a Job (POST Request)
 @app.route('/api/jobs', methods=['POST'])
 def create_job():
     data = request.get_json()
     if not data or not data.get('title') or not data.get('company'):
         return jsonify({"error": "Title and Company are required"}), 400
-    
     try:
         new_job = Job(
             title=data['title'],
@@ -124,20 +116,20 @@ def create_job():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-# 5. Get Single Job
-@app.route('/api/jobs/<int:id>', methods=['GET'])
-def get_job(id):
-    job = Job.query.get_or_404(id)
-    return jsonify(job.to_dict()), 200
+@app.route('/api/applications', methods=['GET'])
+def get_all_applications():
+    try:
+        apps = Application.query.order_by(Application.applied_at.desc()).all()
+        return jsonify([a.to_dict() for a in apps]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-# 6. Apply to Job
 @app.route('/api/jobs/<int:id>/apply', methods=['POST'])
 def apply_to_job(id):
     job = Job.query.get_or_404(id)
     data = request.get_json()
     if not data or not data.get('applicant_name') or not data.get('applicant_email'):
         return jsonify({"error": "Name and Email are required"}), 400
-    
     try:
         new_app = Application(
             job_id=id,
@@ -152,7 +144,11 @@ def apply_to_job(id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-# 7. Delete Job
+@app.route('/api/jobs/<int:id>', methods=['GET'])
+def get_job(id):
+    job = Job.query.get_or_404(id)
+    return jsonify(job.to_dict()), 200
+
 @app.route('/api/jobs/<int:id>', methods=['DELETE'])
 def delete_job(id):
     job = Job.query.get_or_404(id)
@@ -164,8 +160,6 @@ def delete_job(id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-# --- Entry Point ---
 if __name__ == '__main__':
-    # Render ke environment variable 'PORT' ko use karna lazmi hai
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
