@@ -3,63 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NJP Job Portal</title>
+    <title>NJP Job Portal - Admin Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; background: #f4f4f4; }
-        .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .form-section { background: #eef; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn { background: #1a73e8; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
-        .job-card { background: #fff; padding: 15px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: auto; padding: 20px; background: #f4f7f6; color: #333; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1, h2 { color: #1a73e8; text-align: center; }
+        .section { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .btn { background: #1a73e8; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        .btn:hover { background: #1557b0; }
+        .btn-refresh { background: #34a853; margin-bottom: 15px; }
+        
+        /* Job Card Styling */
+        .job-card { background: #fafafa; padding: 15px; margin-top: 15px; border-radius: 8px; border-left: 5px solid #1a73e8; }
+        
+        /* Table Styling for Applications */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; font-size: 14px; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
+        th { background-color: #f8f9fa; color: #555; }
+        tr:hover { background-color: #f1f1f1; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; background: #e8f0fe; color: #1a73e8; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>NJP Job Portal</h1>
-        
-        <div class="form-section">
-            <h3>Post a New Job</h3>
-            <input type="text" id="title" name="title" placeholder="Job Title" required>
-            <input type="text" id="company" name="company" placeholder="Company Name" required>
-            <input type="text" id="location" name="location" placeholder="Location">
-            <textarea id="description" name="description" placeholder="Job Description"></textarea>
-            <button class="btn" onclick="postJob()">Post Job</button>
-        </div>
 
-        <hr>
-        <h2>Recent Jobs</h2>
-        <div id="job-list">Loading...</div>
+<div class="container">
+    <h1>NJP Job Portal Control Panel</h1>
+
+    <div class="section">
+        <h2>Post a New Job</h2>
+        <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" id="title" placeholder="e.g. Senior Web Developer">
+        </div>
+        <div class="form-group">
+            <label>Company Name</label>
+            <input type="text" id="company" placeholder="e.g. NJP Tech Solutions">
+        </div>
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="location" placeholder="e.g. Lahore / Remote">
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="description" rows="3" placeholder="Job details..."></textarea>
+        </div>
+        <button class="btn" onclick="postJob()">🚀 Publish Job</button>
     </div>
 
-    <script>
-        async function fetchJobs() {
+    <div class="section">
+        <h2>Live Job Openings</h2>
+        <div id="job-list">Loading jobs...</div>
+    </div>
+
+    <div class="section" style="border-top: 4px solid #34a853;">
+        <h2>Admin: Received Applications</h2>
+        <button class="btn btn-refresh" onclick="fetchApplications()">🔄 Refresh Applications List</button>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Applicant Name</th>
+                        <th>Email Address</th>
+                        <th>Job ID</th>
+                        <th>Date Applied</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="app-list">
+                    <tr><td colspan="5" style="text-align:center;">Click refresh to load data.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- JOB FUNCTIONS ---
+    async function fetchJobs() {
+        try {
             const res = await fetch('/api/jobs');
             const jobs = await res.json();
             const list = document.getElementById('job-list');
-            list.innerHTML = jobs.length ? '' : 'No jobs found.';
+            list.innerHTML = jobs.length ? '' : '<p>No jobs posted yet.</p>';
             jobs.forEach(job => {
-                list.innerHTML += `<div class="job-card">
-                    <h4>${job.title}</h4>
-                    <p><strong>${job.company}</strong> - ${job.location}</p>
-                </div>`;
+                list.innerHTML += `
+                    <div class="job-card">
+                        <strong>ID: ${job.id}</strong> | <strong>${job.title}</strong> at ${job.company}
+                        <p style="margin: 5px 0; font-size: 13px;">📍 ${job.location}</p>
+                    </div>`;
             });
-        }
+        } catch (e) { console.error("Error fetching jobs", e); }
+    }
 
-        async function postJob() {
-            const data = {
-                title: document.getElementById('title').value,
-                company: document.getElementById('company').value,
-                location: document.getElementById('location').value,
-                description: document.getElementById('description').value
-            };
-            const res = await fetch('/api/jobs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) { alert("Job Added!"); fetchJobs(); }
+    async function postJob() {
+        const data = {
+            title: document.getElementById('title').value,
+            company: document.getElementById('company').value,
+            location: document.getElementById('location').value,
+            description: document.getElementById('description').value
+        };
+
+        if(!data.title || !data.company) return alert("Title and Company are required!");
+
+        const res = await fetch('/api/jobs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        if(res.ok) {
+            alert("Success! Job is now live.");
+            location.reload(); 
         }
-        fetchJobs();
-    </script>
+    }
+
+    // --- APPLICATION FUNCTIONS ---
+    async function fetchApplications() {
+        const list = document.getElementById('app-list');
+        list.innerHTML = '<tr><td colspan="5" style="text-align:center;">Fetching...</td></tr>';
+        
+        try {
+            const res = await fetch('/api/applications');
+            const apps = await res.json();
+            list.innerHTML = apps.length ? '' : '<tr><td colspan="5" style="text-align:center;">No applications found.</td></tr>';
+            
+            apps.forEach(a => {
+                const date = new Date(a.applied_at).toLocaleDateString();
+                list.innerHTML += `
+                    <tr>
+                        <td>${a.applicant_name}</td>
+                        <td>${a.applicant_email}</td>
+                        <td>#${a.job_id}</td>
+                        <td>${date}</td>
+                        <td><span class="status-badge">${a.status}</span></td>
+                    </tr>`;
+            });
+        } catch (e) {
+            alert("Error loading applications. Make sure you updated app.py!");
+        }
+    }
+
+    // Load jobs on startup
+    fetchJobs();
+</script>
+
 </body>
 </html>
