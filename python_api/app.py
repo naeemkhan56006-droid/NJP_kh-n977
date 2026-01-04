@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
+import threading
 
 app = Flask(__name__)
 CORS(app)
@@ -62,12 +63,15 @@ class Application(db.Model):
             "applied_at": self.applied_at.isoformat()
         }
 
-# Create database tables (tolerant to DB connectivity issues)
-try:
-    with app.app_context():
-        db.create_all()
-except Exception as e:
-    app.logger.error("Database initialization failed: %s", e)
+# Initialize the database in a background thread so startup doesn't block if DB is slow/unreachable
+def init_db():
+    try:
+        with app.app_context():
+            db.create_all()
+    except Exception as e:
+        app.logger.error("Database initialization failed: %s", e)
+
+threading.Thread(target=init_db, daemon=True).start()
 
 # --- Routes ---
 @app.route('/', methods=['GET'])
