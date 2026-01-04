@@ -9,7 +9,7 @@ from sqlalchemy import text
 app = Flask(__name__)
 CORS(app)
 
-# Database Configuration using Environment Variables
+# Database Configuration using Environment Variables 
 # Note: Render provides postgresql URL starting with postgres:// which must be updated to postgresql:// for SQLAlchemy
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///jobs.db')
 if database_url and database_url.startswith("postgres://"):
