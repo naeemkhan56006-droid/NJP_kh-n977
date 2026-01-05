@@ -38,10 +38,11 @@ class Application(db.Model):
     def to_dict(self):
         return {"name": self.name, "email": self.email, "job_id": self.job_id}
 
+# Create tables
 with app.app_context():
     db.create_all()
 
-# Routes
+# --- Routes ---
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
