@@ -38,7 +38,6 @@ class Application(db.Model):
     def to_dict(self):
         return {"name": self.name, "email": self.email, "job_id": self.job_id}
 
-# Create tables
 with app.app_context():
     db.create_all()
 
@@ -58,6 +57,7 @@ def handle_jobs():
     jobs = Job.query.order_by(Job.posted_at.desc()).all()
     return jsonify([j.to_dict() for j in jobs])
 
+# FIXED THIS LINE: Added <int:id>
 @app.route('/api/jobs/<int:id>/apply', methods=['POST'])
 def apply(id):
     data = request.get_json()
