@@ -1,76 +1,106 @@
-import os
-from flask import Flask, request, jsonify, send_from_directory
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
-from datetime import datetime, timezone
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NJP Job Portal</title>
+    <style>
+        :root { --primary: #1a73e8; --success: #34a853; --dark: #202124; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h1, h2 { color: var(--primary); }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        .job-item { background: white; border-left: 5px solid var(--primary); padding: 15px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border: 1px solid #eee; text-align: left; }
+        #adminPanel { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🚀 NJP Job Portal</h1>
+            <div id="jobList">Loading jobs...</div>
+        </div>
 
-app = Flask(__name__)
-CORS(app)
+        <div class="card" id="loginBox">
+            <h2>Admin Login</h2>
+            <input type="password" id="pass" placeholder="Password (njp123)">
+            <button class="btn" onclick="checkPass()">Unlock Admin</button>
+        </div>
 
-# Database Configuration (PostgreSQL Support)
-db_uri = os.environ.get('DATABASE_URL')
-if db_uri and db_uri.startswith("postgres://"):
-    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+        <div id="adminPanel" class="card">
+            <h2>Post Job</h2>
+            <input id="t" placeholder="Title">
+            <input id="c" placeholder="Company">
+            <input id="l" placeholder="Location">
+            <button class="btn" onclick="postJob()">Publish</button>
+            <hr>
+            <h2>Applications</h2>
+            <button class="btn" onclick="loadApps()" style="background:var(--success)">Refresh</button>
+            <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Job ID</th></tr></thead>
+                <tbody id="appList"></tbody>
+            </table>
+        </div>
+    </div>
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_uri or 'sqlite:///jobs.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+    <script>
+        async function loadJobs() {
+            const res = await fetch('/api/jobs');
+            const jobs = await res.json();
+            const list = document.getElementById('jobList');
+            list.innerHTML = jobs.length ? '' : 'No jobs found.';
+            jobs.forEach(j => {
+                list.innerHTML += `<div class="job-item">
+                    <div><strong>${j.title}</strong><br><small>${j.company}</small></div>
+                    <button class="btn" style="width:auto" onclick="apply(${j.id})">Apply</button>
+                </div>`;
+            });
+        }
 
-# Database Models
-class Job(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    company = db.Column(db.String(100), nullable=False)
-    location = db.Column(db.String(100))
-    posted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    applications = db.relationship('Application', backref='job', lazy=True, cascade="all, delete-orphan")
+        async function apply(id) {
+            const name = prompt("Name:");
+            const email = prompt("Email:");
+            if(name && email) {
+                await fetch(`/api/jobs/${id}/apply`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, email})
+                });
+                alert("Applied!");
+            }
+        }
 
-    def to_dict(self):
-        return {"id": self.id, "title": self.title, "company": self.company, "location": self.location}
+        function checkPass() {
+            if(document.getElementById('pass').value === 'njp123') {
+                document.getElementById('loginBox').style.display='none';
+                document.getElementById('adminPanel').style.display='block';
+                loadApps();
+            } else { alert("Wrong!"); }
+        }
 
-class Application(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    applied_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+        async function postJob() {
+            await fetch('/api/jobs', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({title: document.getElementById('t').value, company: document.getElementById('c').value, location: document.getElementById('l').value})
+            });
+            alert("Posted!"); loadJobs();
+        }
 
-    def to_dict(self):
-        return {"name": self.name, "email": self.email, "job_id": self.job_id}
-
-# Create tables
-with app.app_context():
-    db.create_all()
-
-# --- Routes ---
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/api/jobs', methods=['GET', 'POST'])
-def handle_jobs():
-    if request.method == 'POST':
-        data = request.get_json()
-        new_job = Job(title=data['title'], company=data['company'], location=data.get('location'))
-        db.session.add(new_job)
-        db.session.commit()
-        return jsonify(new_job.to_dict()), 201
-    jobs = Job.query.order_by(Job.posted_at.desc()).all()
-    return jsonify([j.to_dict() for j in jobs])
-
-@app.route('/api/jobs/<int:id>/apply', methods=['POST'])
-def apply(id):
-    data = request.get_json()
-    new_app = Application(job_id=id, name=data['name'], email=data['email'])
-    db.session.add(new_app)
-    db.session.commit()
-    return jsonify({"message": "Success"}), 201
-
-@app.route('/api/applications', methods=['GET'])
-def get_apps():
-    apps = Application.query.order_by(Application.applied_at.desc()).all()
-    return jsonify([a.to_dict() for a in apps])
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+        async function loadApps() {
+            const res = await fetch('/api/applications');
+            const apps = await res.json();
+            const tbody = document.getElementById('appList');
+            tbody.innerHTML = '';
+            apps.forEach(a => {
+                tbody.innerHTML += `<tr><td>${a.name}</td><td>${a.email}</td><td>#${a.job_id}</td></tr>`;
+            });
+        }
+        loadJobs();
+    </script>
+</body>
+</html>
