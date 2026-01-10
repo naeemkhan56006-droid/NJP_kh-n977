@@ -22,11 +22,25 @@ class Job(db.Model):
     title = db.Column(db.String(100), nullable=False)
     company = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    salary = db.Column(db.String(50))
+    job_type = db.Column(db.String(50))  # Full-time, Part-time, Contract, etc.
+    category = db.Column(db.String(50))  # Tech, Health, Finance, etc.
     posted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     applications = db.relationship('Application', backref='job', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
-        return {"id": self.id, "title": self.title, "company": self.company, "location": self.location}
+        return {
+            "id": self.id, 
+            "title": self.title, 
+            "company": self.company, 
+            "location": self.location,
+            "description": self.description,
+            "salary": self.salary,
+            "job_type": self.job_type,
+            "category": self.category,
+            "posted_at": self.posted_at.isoformat() if self.posted_at else None
+        }
 
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,9 +50,11 @@ class Application(db.Model):
     applied_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
-        return {"name": self.name, "email": self.email, "job_id": self.job_id}
+        return {"name": self.name, "email": self.email, "job_id": self.job_id, "applied_at": self.applied_at.isoformat()}
 
 with app.app_context():
+    # Force recreation for schema change in dev
+    db.drop_all()
     db.create_all()
 
 @app.route('/')
@@ -50,11 +66,30 @@ def handle_jobs():
     try:
         if request.method == 'POST':
             data = request.get_json()
-            new_job = Job(title=data['title'], company=data['company'], location=data.get('location'))
+            new_job = Job(
+                title=data['title'], 
+                company=data['company'], 
+                location=data.get('location'),
+                description=data.get('description'),
+                salary=data.get('salary'),
+                job_type=data.get('job_type'),
+                category=data.get('category')
+            )
             db.session.add(new_job)
             db.session.commit()
             return jsonify(new_job.to_dict()), 201
-        jobs = Job.query.order_by(Job.posted_at.desc()).all()
+        
+        # Simple Search/Filter
+        query = Job.query
+        cat = request.args.get('category')
+        if cat:
+            query = query.filter(Job.category == cat)
+        
+        search = request.args.get('search')
+        if search:
+            query = query.filter(Job.title.ilike(f'%{search}%') | Job.company.ilike(f'%{search}%'))
+
+        jobs = query.order_by(Job.posted_at.desc()).all()
         return jsonify([j.to_dict() for j in jobs]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -79,5 +114,5 @@ def get_apps():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
