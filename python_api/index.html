@@ -102,6 +102,20 @@
             gap: 15px;
         }
 
+        .nav-link {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
         /* Hero */
         .hero {
             background: linear-gradient(rgba(45, 126, 62, 0.9), rgba(45, 126, 62, 0.9)),
@@ -594,29 +608,62 @@
     <div class="top-bar">
         <div class="container">
             <div>Welcome to NJP Global Job Portal</div>
-            <div>
-                <a href="javascript:void(0);" onclick="openModal('loginModal')">Login</a>
+            <div style="display: flex; gap: 5px;">
                 <a href="javascript:void(0);" onclick="openModal('loginModal')">Register</a>
+                <span style="color: rgba(255,255,255,0.5);">|</span>
+                <a href="javascript:void(0);" onclick="openModal('loginModal')">Login</a>
+                <span style="color: rgba(255,255,255,0.5);">|</span>
+                <a href="javascript:void(0);" onclick="openAdminLogin()">Member Login</a>
             </div>
         </div>
     </div>
 
-    <!--Header -->
-    <header>
-        <div class="container">
+    <!-- Main Navigation -->
+    <nav style="background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 15px 0;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="logo">NJP GLOBAL</div>
-            <div class="nav-btns">
-                <button class="btn btn-ghost" id="homeBtn" onclick="showView('user')">Find Jobs</button>
-                <button class="btn btn-primary" id="adminLoginBtn" onclick="openAdminLogin()">Employer Portal</button>
+            <div style="display: flex; gap: 30px;">
+                <a href="javascript:void(0);" onclick="showView('user')" class="nav-link">Home</a>
+                <a href="javascript:void(0);" onclick="showView('user')" class="nav-link">Jobs</a>
+                <a href="javascript:void(0);" class="nav-link">Departmental Contacts</a>
+                <a href="javascript:void(0);" class="nav-link">FAQ's</a>
             </div>
         </div>
-    </header>
+    </nav>
 
     <div id="userView">
         <!-- Hero Section -->
         <section class="hero">
-            <h1>Government Job Opportunities</h1>
+            <h1>Available Jobs</h1>
             <p>Browse thousands of opportunities from government departments and public organizations nationwide.</p>
+        </section>
+
+        <!-- Benefits Section -->
+        <section style="background: var(--bg); padding: 60px 0;">
+            <div class="container">
+                <div class="benefits-grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px; display: grid;">
+                    <div style="text-align: center; padding: 30px;">
+                        <i data-lucide="file-text"
+                            style="width: 48px; height: 48px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text);">Create Your Resume</h3>
+                        <p style="color: var(--text-muted); font-size: 15px;">Create your online resume and make it
+                            available to Government Departments.</p>
+                    </div>
+                    <div style="text-align: center; padding: 30px;">
+                        <i data-lucide="building-2"
+                            style="width: 48px; height: 48px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text);">Single Stop Shop</h3>
+                        <p style="color: var(--text-muted); font-size: 15px;">Single stop shop across the board for
+                            Government Jobs.</p>
+                    </div>
+                    <div style="text-align: center; padding: 30px;">
+                        <i data-lucide="mouse-pointer-click"
+                            style="width: 48px; height: 48px; color: var(--primary); margin-bottom: 20px;"></i>
+                        <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--text);">Easy Application</h3>
+                        <p style="color: var(--text-muted); font-size: 15px;">Apply with a click of button.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <div class="container">
@@ -856,6 +903,65 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer style="background: #2a2a2a; color: #f5f5f5; padding: 60px 0 30px; margin-top: 80px;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 50px; margin-bottom: 40px;">
+                <!-- Column 1: Main Links -->
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 20px; font-size: 18px;">Main Links</h4>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="javascript:void(0);" onclick="showView('user')"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Home</a>
+                        <a href="javascript:void(0);" onclick="showView('user')"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Jobs</a>
+                        <a href="javascript:void(0);"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">FAQ's</a>
+                        <a href="javascript:void(0);"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Departmental
+                            Contacts</a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Resources -->
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 20px; font-size: 18px;">Resources</h4>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <a href="javascript:void(0);"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Interview Guides</a>
+                        <a href="javascript:void(0);"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Job Search Guides</a>
+                        <a href="javascript:void(0);"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Career Development</a>
+                        <a href="javascript:void(0);"
+                            style="color: #ccc; text-decoration: none; transition: color 0.3s;">Career News</a>
+                    </div>
+                </div>
+
+                <!-- Column 3: Contact -->
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 20px; font-size: 18px;">Contact Us</h4>
+                    <div style="display: flex; flex-direction: column; gap: 15px; color: #ccc;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i data-lucide="phone" style="width: 18px;"></i>
+                            <span>+92 42 35880062 Ext:1222</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i data-lucide="mail" style="width: 18px;"></i>
+                            <a href="mailto:jobsonlinesupport@punjab.gov.pk"
+                                style="color: #ccc; text-decoration: none;">jobsonlinesupport@punjab.gov.pk</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="border-top: 1px solid #444; padding-top: 25px; text-align: center; color: #999; font-size: 13px;">
+                <p>&copy; 2026 NJP Global Job Portal. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <div class="toast" id="toast">Success!</div>
 
