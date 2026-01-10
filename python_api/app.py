@@ -85,11 +85,21 @@ with app.app_context():
     
     # Pre-populate some news
     sample_news = [
-        News(title="AI Job Market Surges in 2026", content="New data shows a 45% increase in AI-related roles.", category="Career", image_url="https://images.unsplash.com/photo-1677442136019-21780ecad995"),
-        News(title="Remote Work 2.0: The Future of AGENTIC Coding", content="How AI agents are changing the landscape of development.", category="Tech", image_url="https://images.unsplash.com/photo-1498050108023-c5249f4df085"),
-        News(title="Top 5 Skills for FinTech in 2026", content="Blockchain and Python remain crucial for financial technology.", category="Finance", image_url="https://images.unsplash.com/photo-1551288049-bebda4e38f71")
+        News(title="AI Job Market Surges in 2026", content="New data shows a 45% increase in AI-related roles. This growth is driven by the rapid adoption of agentic systems across all sectors of the economy, including healthcare and finance.", category="Career", image_url="https://images.unsplash.com/photo-1677442136019-21780ecad995"),
+        News(title="Remote Work 2.0: The Future of AGENTIC Coding", content="How AI agents are changing the landscape of development. Teams are now using AI-driven orchestration to manage complex microservices with minimal human overhead.", category="Tech", image_url="https://images.unsplash.com/photo-1498050108023-c5249f4df085"),
+        News(title="Top 5 Skills for FinTech in 2026", content="Blockchain and Python remain crucial for financial technology. Modern fintech firms are prioritizing candidates who can build robust, AI-integrated trading platforms.", category="Finance", image_url="https://images.unsplash.com/photo-1551288049-bebda4e38f71")
     ]
     db.session.add_all(sample_news)
+    
+    # Richer Sample Jobs
+    sample_jobs = [
+        Job(title="Senior Cloud Architect", company="Nebula Systems", location="Remote", salary="$180k - $240k", job_type="Full-time", category="Tech", description="Lead our global cloud migration strategy. You will be responsible for designing resilient architectures and managing multi-cloud deployments.", requirements="10+ years AWS/GCP experience. Strong leadership skills.", benefits="Remote first, stock options, premium health coverage."),
+        Job(title="UX/UI Designer", company="Pixel Perfect", location="New York, NY", salary="$120k", job_type="Full-time", category="Design", description="Create delightful experiences for our next-gen mobile app. Focus on user-centric design principles and accessibility.", requirements="Strong portfolio with Figma skills. Experience with mobile apps.", benefits="Creative studio access, annual performance bonus."),
+        Job(title="Finance Analyst", company="Goldman Sage", location="London, UK", salary="£90k", job_type="Contract", category="Finance", description="High-stakes financial modeling and trend analysis. Assist in quarterly planning and strategic investment evaluations.", requirements="CFA Level 2 preferred. Mastery of Excel and SQL.", benefits="High day rate, networking with industry leaders."),
+        Job(title="Growth Marketer", company="Viral Edge", location="Austin, TX", salary="$110k", job_type="Full-time", category="Marketing", description="Scale our user base through data-driven campaigns. Manage a multi-channel acquisition strategy and optimize ROAS.", requirements="Experience with SQL and Meta Ads. A/B testing expertise.", benefits="Flexible hours, modern office in downtown Austin."),
+        Job(title="Junior Developer", company="CodeStart", location="Remote", salary="$70k", job_type="Remote", category="Tech", description="Support our engineering team in building internal tools. Learn from senior mentors while contributing to production code.", requirements="Python or JavaScript knowledge. Degree in CS or equivalent experience.", benefits="Professional mentorship, annual learning budget.")
+    ]
+    db.session.add_all(sample_jobs)
     db.session.commit()
 
 @app.route('/')
@@ -126,12 +136,16 @@ def handle_jobs():
             db.session.commit()
             return jsonify(new_job.to_dict()), 201
         
-        # Enhanced Search/Filter
+        # Enhanced Filter Logic
         query = Job.query
         cat = request.args.get('category')
         if cat:
             query = query.filter(Job.category == cat)
         
+        jt = request.args.get('job_type')
+        if jt:
+            query = query.filter(Job.job_type == jt)
+            
         search = request.args.get('search')
         if search:
             search_pattern = f'%{search}%'
