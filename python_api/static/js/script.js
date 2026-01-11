@@ -2,19 +2,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Load
     loadJobs();
     loadStats();
-    
+
     // Event Listeners
-    setupSearch();
     setupModals();
+
+    // Check for saved admin session
+    if (localStorage.getItem('isAdmin') === 'true') {
+        document.getElementById('navAdminLink').style.display = 'block';
+    }
 });
 
 // State
 let allJobs = [];
+let isAdmin = false;
+
+// View Management
+function showView(viewName) {
+    document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+    document.getElementById(`${viewName}View`).style.display = 'block';
+    window.scrollTo(0, 0);
+
+    if (viewName === 'admin') {
+        loadAdminStats();
+    }
+}
 
 // API Calls
 async function loadJobs(filters = {}) {
     const grid = document.getElementById('jobsGrid');
-    
+
     // Show skeleton/loading state
     if (!allJobs.length) {
         grid.innerHTML = '<div class="loader">Loading opportunities...</div>';
@@ -23,11 +39,11 @@ async function loadJobs(filters = {}) {
     try {
         let url = '/api/jobs';
         const params = new URLSearchParams();
-        
+
         if (filters.search) params.append('search', filters.search);
         if (filters.category) params.append('category', filters.category);
         if (filters.type) params.append('job_type', filters.type); // Fixed key matching backend
-        
+
         if (Array.from(params).length > 0) {
             url += `?${params.toString()}`;
         }
@@ -49,7 +65,7 @@ async function loadStats() {
         new: 85,
         companies: 320
     };
-    
+
     // Animate numbers
     animateValue('statTotal', 0, stats.active, 2000);
     animateValue('statNew', 0, stats.new, 2000);
@@ -60,7 +76,7 @@ async function loadStats() {
 function renderJobs(jobs) {
     const grid = document.getElementById('jobsGrid');
     grid.innerHTML = '';
-    
+
     if (jobs.length === 0) {
         grid.innerHTML = `
             <div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 40px;">
@@ -107,7 +123,7 @@ function renderJobs(jobs) {
         `;
         grid.appendChild(card);
     });
-    
+
     // Re-run lucide icons
     if (window.lucide) lucide.createIcons();
 }
@@ -129,83 +145,211 @@ function setupSearch() {
     }
 
     searchBtn.addEventListener('click', executeSearch);
-    
+
     // Debounce input
     let timeout;
     searchInput.addEventListener('input', () => {
         clearTimeout(timeout);
         timeout = setTimeout(executeSearch, 500);
     });
-    
+
     categorySelect.addEventListener('change', executeSearch);
     typeSelect.addEventListener('change', executeSearch);
 }
 
-// Modals
+// Modals & Admin
 function setupModals() {
     const overlay = document.getElementById('modalOverlay');
     const closeBtns = document.querySelectorAll('.modal-close');
-    
+
     closeBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            overlay.classList.remove('active');
+            closeAllModals();
         });
     });
-    
+
     overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            overlay.classList.remove('active');
-        }
+        if (e.target === overlay) closeAllModals();
     });
 
-    // Form Submission
+    // Forms
+    setupApplyForm();
+    setupJobForm();
+    setupAdminLogin();
+}
+
+function closeAllModals() {
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.querySelectorAll('.modal-content').forEach(el => el.style.display = 'none');
+}
+
+function openModal(modalId) {
+    const overlay = document.getElementById('modalOverlay');
+    closeAllModals(); // Hide others
+    overlay.classList.add('active');
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function setupApplyForm() {
     const form = document.getElementById('applyForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerText;
+        submitBtn.innerText = 'Sending...';
+        submitBtn.disabled = true;
+
         const jobId = form.dataset.jobId;
         const formData = {
             name: document.getElementById('applicantName').value,
             email: document.getElementById('applicantEmail').value
         };
-        
+
         try {
             const res = await fetch(`/api/jobs/${jobId}/apply`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
-            
+
             if (res.ok) {
-                alert('Application submitted successfully!');
-                overlay.classList.remove('active');
+                showToast('Application submitted successfully!', 'success');
+                closeAllModals();
                 form.reset();
             } else {
-                alert('Failed to submit application.');
+                showToast('Failed to submit application.', 'error');
             }
         } catch (error) {
             console.error(error);
-            alert('Error submitting application');
+            showToast('Error submitting application', 'error');
+        } finally {
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+function setupJobForm() {
+    const form = document.getElementById('postJobForm');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = {
+            title: document.getElementById('jobTitle').value,
+            company: document.getElementById('jobCompany').value,
+            category: document.getElementById('jobCategory').value,
+            job_type: document.getElementById('jobType').value,
+            location: document.getElementById('jobLocation').value,
+            salary: document.getElementById('jobSalary').value,
+            description: document.getElementById('jobDesc').value,
+            deadline: new Date().toISOString() // Simple default
+        };
+
+        try {
+            const res = await fetch('/api/jobs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            if (res.ok) {
+                showToast('Job posted successfully!', 'success');
+                closeAllModals();
+                form.reset();
+                loadJobs(); // Refresh user list
+                loadAdminStats(); // Refresh admin list
+            } else {
+                showToast('Failed to post job.', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            showToast('Error posting job', 'error');
+        }
+    });
+}
+
+function setupAdminLogin() {
+    const btn = document.getElementById('adminLoginBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === 'admin123' || pass === 'njp123') { // Simple client-side auth
+            isAdmin = true;
+            localStorage.setItem('isAdmin', 'true');
+            showToast('Welcome back, Admin!', 'success');
+            closeAllModals();
+            document.getElementById('navAdminLink').style.display = 'block';
+            showView('admin');
+        } else {
+            showToast('Invalid access code', 'error');
         }
     });
 }
 
 function openApplyModal(jobId, jobTitle) {
-    const overlay = document.getElementById('modalOverlay');
     const titleEl = document.getElementById('modalJobTitle');
     const form = document.getElementById('applyForm');
-    
+
     titleEl.textContent = `Apply for ${jobTitle}`;
     form.dataset.jobId = jobId;
-    
-    overlay.classList.add('active');
+
+    openModal('applyModalContent');
+}
+
+// Admin Utils
+async function loadAdminStats() {
+    try {
+        const [jobsRes, appsRes] = await Promise.all([
+            fetch('/api/jobs'),
+            fetch('/api/applications')
+        ]);
+
+        const jobs = await jobsRes.json();
+        const apps = await appsRes.json();
+
+        document.getElementById('totalAdminJobs').textContent = jobs.length;
+        document.getElementById('totalAdminApps').textContent = apps.length;
+
+        // Render recent apps
+        const tbody = document.getElementById('adminAppsTable');
+        tbody.innerHTML = apps.slice(0, 10).map(app => `
+            <tr>
+                <td>${escapeHtml(app.name)}</td>
+                <td>${escapeHtml(app.email)}</td>
+                <td>Job #${app.job_id}</td>
+                <td>${new Date(app.applied_at).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
+
+    } catch (e) {
+        console.error("Admin stats error", e);
+    }
+}
+
+// Toast Notification
+function showToast(message, type = 'info') {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
 }
 
 // Utils
 function animateValue(id, start, end, duration) {
     const obj = document.getElementById(id);
     if (!obj) return;
-    
+
     let startTimestamp = null;
     const step = (timestamp) => {
         if (!startTimestamp) startTimestamp = timestamp;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar">
@@ -18,130 +20,254 @@
                 NJP <span>Global</span>
             </div>
             <div class="nav-links">
-                <a href="#" class="nav-link">Find Jobs</a>
+                <a href="#" class="nav-link" onclick="showView('user')">Find Jobs</a>
                 <a href="#" class="nav-link">Companies</a>
-                <a href="#" class="nav-link">Career Advice</a>
+                <a href="#" class="nav-link" id="navAdminLink" style="display: none;"
+                    onclick="showView('admin')">Dashboard</a>
             </div>
             <div class="nav-cta">
-                <button class="btn btn-ghost">Sign In</button>
-                <button class="btn btn-primary">Post a Job</button>
+                <button class="btn btn-ghost" onclick="openModal('loginModalContent')">Member Login</button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero -->
-    <header class="hero">
-        <div class="container hero-content">
-            <div class="hero-badge">
-                <i data-lucide="sparkles" style="width: 14px"></i>
-                Official Government Portal
+    <!-- User View -->
+    <div id="userView" class="view-section">
+        <!-- Hero -->
+        <header class="hero">
+            <div class="container hero-content">
+                <div class="hero-badge">
+                    <i data-lucide="sparkles" style="width: 14px"></i>
+                    Official Government Portal
+                </div>
+                <h1>Find Your <span class="highlight">Dream Career</span> Today</h1>
+                <p>Connect with top government departments and private sector leaders. <br>Your next big opportunity is
+                    just a search away.</p>
+
+                <div class="search-wrapper">
+                    <div class="search-field">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="searchInput" placeholder="Job title, keywords, or company...">
+                    </div>
+                    <div class="search-field">
+                        <i data-lucide="layers"></i>
+                        <select id="categorySelect">
+                            <option value="">All Categories</option>
+                            <option value="Tech">Technology</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Design">Design</option>
+                        </select>
+                    </div>
+                    <div class="search-field">
+                        <i data-lucide="briefcase"></i>
+                        <select id="typeSelect">
+                            <option value="">Job Type</option>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Remote">Remote</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="searchBtn" style="border-radius: 8px;">
+                        Search Jobs
+                    </button>
+                </div>
             </div>
-            <h1>Find Your <span class="highlight">Dream Career</span> Today</h1>
-            <p>Connect with top government departments and private sector leaders. <br>Your next big opportunity is just a search away.</p>
-            
-            <div class="search-wrapper">
-                <div class="search-field">
-                    <i data-lucide="search"></i>
-                    <input type="text" id="searchInput" placeholder="Job title, keywords, or company...">
+        </header>
+
+        <!-- Stats -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i data-lucide="users"></i></div>
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Active Jobs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i data-lucide="briefcase"></i></div>
+                        <div class="stat-value" id="statNew">0</div>
+                        <div class="stat-label">New Opportunities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i data-lucide="building-2"></i></div>
+                        <div class="stat-value" id="statCompanies">0</div>
+                        <div class="stat-label">Hiring Companies</div>
+                    </div>
                 </div>
-                <div class="search-field">
-                    <i data-lucide="layers"></i>
-                    <select id="categorySelect">
-                        <option value="">All Categories</option>
-                        <option value="Tech">Technology</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Design">Design</option>
-                    </select>
+            </div>
+        </section>
+
+        <!-- Jobs List -->
+        <section class="container">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Latest Opportunities</h2>
+                    <div class="section-subtitle">Hand-picked roles for you</div>
                 </div>
-                <div class="search-field">
-                    <i data-lucide="briefcase"></i>
-                    <select id="typeSelect">
-                        <option value="">Job Type</option>
-                        <option value="Full-time">Full-time</option>
-                        <option value="Contract">Contract</option>
-                        <option value="Remote">Remote</option>
-                    </select>
+                <a href="#" class="btn btn-ghost" style="font-size: 0.9rem">View All Jobs <i data-lucide="arrow-right"
+                        style="width: 16px"></i></a>
+            </div>
+
+            <div id="jobsGrid" class="jobs-grid">
+                <!-- Jobs injected via JS -->
+                <div class="loader" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <i data-lucide="loader-2" class="spin"></i> Loading...
                 </div>
-                <button class="btn btn-primary" id="searchBtn" style="border-radius: 8px;">
-                    Search Jobs
+            </div>
+        </section>
+
+    </div>
+    </section>
+    </div> <!-- End User View -->
+
+    <!-- Admin View -->
+    <div id="adminView" class="view-section" style="display: none; padding-top: 40px;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Admin Dashboard</h2>
+                <button class="btn btn-primary" onclick="openModal('postJobModalContent')">
+                    <i data-lucide="plus"></i> Post New Job
                 </button>
             </div>
-        </div>
-    </header>
 
-    <!-- Stats -->
-    <section class="stats-section">
-        <div class="container">
-            <div class="stats-grid">
+            <div class="stats-grid" style="margin-bottom: 40px;">
                 <div class="stat-card">
-                    <div class="stat-icon"><i data-lucide="users"></i></div>
-                    <div class="stat-value" id="statTotal">0</div>
-                    <div class="stat-label">Active Jobs</div>
+                    <div class="stat-label">Total Jobs</div>
+                    <div class="stat-value" id="totalAdminJobs">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon"><i data-lucide="briefcase"></i></div>
-                    <div class="stat-value" id="statNew">0</div>
-                    <div class="stat-label">New Opportunities</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i data-lucide="building-2"></i></div>
-                    <div class="stat-value" id="statCompanies">0</div>
-                    <div class="stat-label">Hiring Companies</div>
+                    <div class="stat-label">Total Applications</div>
+                    <div class="stat-value" id="totalAdminApps">0</div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Jobs List -->
-    <section class="container">
-        <div class="section-header">
-            <div>
-                <h2 class="section-title">Latest Opportunities</h2>
-                <div class="section-subtitle">Hand-picked roles for you</div>
+            <div
+                style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden;">
+                <h3 style="padding: 24px; border-bottom: 1px solid var(--border);">Recent Applications</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #F8FAFC;">
+                        <tr>
+                            <th style="padding: 16px; text-align: left; font-weight: 600;">Candidate</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 600;">Email</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 600;">Job ID</th>
+                            <th style="padding: 16px; text-align: left; font-weight: 600;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminAppsTable">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
             </div>
-            <a href="#" class="btn btn-ghost" style="font-size: 0.9rem">View All Jobs <i data-lucide="arrow-right" style="width: 16px"></i></a>
         </div>
-        
-        <div id="jobsGrid" class="jobs-grid">
-            <!-- Jobs injected via JS -->
-            <div class="loader" style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                <i data-lucide="loader-2" class="spin"></i> Loading...
-            </div>
-        </div>
-    </section>
+    </div>
 
-    <!-- Modal -->
+    <!-- Modals -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
-            <div class="modal-header">
-                <h3 id="modalJobTitle">Apply for Job</h3>
-                <button class="modal-close"><i data-lucide="x"></i></button>
+            <!-- Apply Modal -->
+            <div id="applyModalContent" class="modal-content" style="display:none;">
+                <div class="modal-header">
+                    <h3 id="modalJobTitle">Apply for Job</h3>
+                    <button class="modal-close"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="applyForm">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="applicantName" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="applicantEmail" required
+                                placeholder="john@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Resume / Portfolio URL</label>
+                            <input type="url" class="form-input" placeholder="https://linkedin.com/in/john">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cover Letter</label>
+                            <textarea class="form-input" rows="4"
+                                placeholder="Tell us why you're a great fit..."></textarea>
+                        </div>
+                        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
+                            <button type="button" class="btn btn-ghost modal-close">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Application</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="applyForm">
+
+            <!-- Login Modal -->
+            <div id="loginModalContent" class="modal-content" style="display:none;">
+                <div class="modal-header">
+                    <h3>Admin Member Login</h3>
+                    <button class="modal-close"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="form-input" id="applicantName" required placeholder="John Doe">
+                        <label class="form-label">Access Code</label>
+                        <input type="password" class="form-input" id="adminPass" placeholder="Enter code (njp123)">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" class="form-input" id="applicantEmail" required placeholder="john@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Resume / Portfolio URL</label>
-                        <input type="url" class="form-input" placeholder="https://linkedin.com/in/john">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Cover Letter</label>
-                        <textarea class="form-input" rows="4" placeholder="Tell us why you're a great fit..."></textarea>
-                    </div>
-                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
-                        <button type="button" class="btn btn-ghost modal-close">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Submit Application</button>
-                    </div>
-                </form>
+                    <button class="btn btn-primary" style="width: 100%;" id="adminLoginBtn">Login</button>
+                </div>
             </div>
+
+            <!-- Post Job Modal -->
+            <div id="postJobModalContent" class="modal-content" style="display:none;">
+                <div class="modal-header">
+                    <h3>Post New Opportunity</h3>
+                    <button class="modal-close"><i data-lucide="x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="postJobForm">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">Job Title</label>
+                                <input id="jobTitle" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Company</label>
+                                <input id="jobCompany" class="form-input" required>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select id="jobCategory" class="form-input">
+                                    <option>Tech</option>
+                                    <option>Finance</option>
+                                    <option>Marketing</option>
+                                    <option>Design</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select id="jobType" class="form-input">
+                                    <option>Full-time</option>
+                                    <option>Contract</option>
+                                    <option>Remote</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input id="jobLocation" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Salary</label>
+                            <input id="jobSalary" class="form-input" placeholder="e.g. $100k - $120k">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea id="jobDesc" class="form-input" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Post Job</button>
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -151,4 +277,5 @@
     </script>
     <script src="/static/js/script.js"></script>
 </body>
+
 </html>
