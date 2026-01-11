@@ -1,0 +1,95 @@
+/* App.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;700&display=swap');
+
+:root {
+  --gold: #d4af37;
+  --black: #0a0a0a;
+  --dark-grey: #161616;
+}
+
+body {
+  margin: 0;
+  background-color: var(--black) !important;
+  color: var(--gold) !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.luxury-nav {
+  background: #111;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 50px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.gold-logo {
+  border: 2px solid var(--gold);
+  padding: 5px 12px;
+  font-weight: 900;
+  font-size: 24px;
+}
+
+.job-card {
+  background: var(--dark-grey);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  padding: 30px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.job-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.1);
+}
+
+.gold-btn {
+  background: var(--gold);
+  color: black;
+  border: none;
+  padding: 12px 25px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.gold-btn:hover {
+  background: white;
+}
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #111;
+  border: 1px solid var(--gold);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.input-field {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: black;
+  border: 1px solid #333;
+  color: white;
+}
