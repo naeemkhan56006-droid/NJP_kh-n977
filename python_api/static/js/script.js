@@ -627,17 +627,24 @@ function openModal(modalId) {
 
 function setupApplyForm() {
     const form = document.getElementById('applyForm');
+    if (!form) return;
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerText;
-        submitBtn.innerText = 'Sending...';
-        submitBtn.disabled = true;
+        const originalText = submitBtn ? submitBtn.innerText : 'Submit';
+        if (submitBtn) {
+            submitBtn.innerText = 'Sending...';
+            submitBtn.disabled = true;
+        }
 
         const jobId = form.dataset.jobId;
+        const nameInput = document.getElementById('applicantName');
+        const emailInput = document.getElementById('applicantEmail');
+
         const formData = {
-            name: document.getElementById('applicantName').value,
-            email: document.getElementById('applicantEmail').value
+            name: nameInput ? nameInput.value : '',
+            email: emailInput ? emailInput.value : ''
         };
 
         try {
@@ -651,7 +658,7 @@ function setupApplyForm() {
                 // showToast('Application submitted successfully!', 'success'); // Old toaster
                 closeAllModals();
                 form.reset();
-                openModal('successModal'); // New Golden Checkmark
+                if (window.openModal) openModal('successModal'); // New Golden Checkmark
                 if (window.lucide) lucide.createIcons();
             } else {
                 showToast('Failed to submit application.', 'error');
@@ -660,8 +667,10 @@ function setupApplyForm() {
             console.error(error);
             showToast('Error submitting application', 'error');
         } finally {
-            submitBtn.innerText = originalText;
-            submitBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
         }
     });
 }
