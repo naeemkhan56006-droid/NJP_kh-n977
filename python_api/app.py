@@ -2,6 +2,8 @@ import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timezone
 
 app = Flask(__name__)
@@ -22,6 +24,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -170,6 +184,32 @@ def get_news():
     try:
         news = News.query.order_by(News.published_at.desc()).all()
         return jsonify([n.to_dict() for n in news]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        if User.query.filter_by(username=data.get('username')).first():
+            return jsonify({"error": "Username taken"}), 400
+        
+        user = User(username=data['username'], email=data['email'])
+        user.set_password(data['password'])
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({"message": "User registered successfully"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        user = User.query.filter((User.username == data['username']) | (User.email == data['username'])).first()
+        if user and user.check_password(data['password']):
+            return jsonify({"message": "Login successful", "username": user.username, "isAdmin": "admin" in user.username.lower()}), 200
+        return jsonify({"error": "Invalid credentials"}), 401
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
