@@ -651,15 +651,42 @@ function setupLogin() {
 }
 
 function closeAllModals() {
-    document.getElementById('modalOverlay').classList.remove('active');
-    document.querySelectorAll('.modal-content').forEach(el => el.style.display = 'none');
+    const overlay = document.getElementById('modalOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+    }
+    const modals = document.querySelectorAll('.modal-content');
+    if (modals) {
+        modals.forEach(el => el.style.display = 'none');
+    }
 }
 
 function openModal(modalId) {
     const overlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById(modalId);
+
+    if (!modal) {
+        console.error(`Modal with ID "${modalId}" not found.`);
+        return;
+    }
+
     closeAllModals(); // Hide others
-    overlay.classList.add('active');
-    document.getElementById(modalId).style.display = 'block';
+
+    if (overlay) {
+        overlay.classList.add('active');
+    }
+
+    modal.style.display = 'block';
+
+    // Animation trigger for success modal
+    if (modalId === 'successModal') {
+        const check = modal.querySelector('.success-checkmark i');
+        if (check) {
+            check.style.animation = 'none';
+            check.offsetHeight; /* trigger reflow */
+            check.style.animation = 'checkAppear 0.3s 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+        }
+    }
 }
 
 function setupApplyForm() {
