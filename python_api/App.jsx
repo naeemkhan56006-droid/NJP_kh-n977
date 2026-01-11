@@ -1,8 +1,12 @@
 import React, { useState, useMemo } from 'react';
+import './App.css'; 
 import jobsData from './jobs.json';
 
-const NJPGlobalFinal = () => {
-  // States
+// Note: Make sure your App.css has the styles I provided earlier.
+// If not, this code uses inline styles as a backup to ensure the Black/Gold theme.
+
+const App = () => {
+  // --- States ---
   const [jobs] = useState(jobsData);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedJob, setSelectedJob] = useState(null);
@@ -11,151 +15,161 @@ const NJPGlobalFinal = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const jobsPerPage = 6;
 
-  // Logic: Filter and Pagination
+  // --- Search & Filter Logic ---
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
-      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            job.company.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCat = filters.category === "All" || job.category === filters.category;
       const matchesType = filters.type === "All" || job.type === filters.type;
       return matchesSearch && matchesCat && matchesType;
     });
   }, [searchTerm, filters, jobs]);
 
-  const currentJobs = filteredJobs.slice((currentPage - 1) * jobsPerPage, currentPage * jobsPerPage);
+  // --- Pagination Logic ---
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
   const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
 
-  const scrollToJobs = () => document.getElementById('job-section').scrollIntoView({ behavior: 'smooth' });
+  const scrollToJobs = () => {
+    const element = document.getElementById('job-section');
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // --- Inline Styles (Forced Theme) ---
+  const gold = "#d4af37";
+  const black = "#0a0a0a";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-[#d4af37] font-sans selection:bg-[#d4af37] selection:text-black">
+    <div style={{ backgroundColor: black, color: gold, minHeight: '100vh', fontFamily: 'serif' }}>
       
       {/* LUXURY NAVBAR */}
-      <nav className="bg-[#111] border-b border-[#d4af37]/20 px-8 py-5 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo(0,0)}>
-          <div className="border-2 border-[#d4af37] w-10 h-10 flex items-center justify-center rounded-sm font-black text-xl shadow-[0_0_15px_rgba(212,175,55,0.2)]">N</div>
-          <span className="text-2xl font-serif tracking-widest uppercase">NJP Global</span>
+      <nav style={{ 
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+        padding: '20px 50px', backgroundColor: '#111', borderBottom: `1px solid ${gold}33`,
+        position: 'sticky', top: 0, zIndex: 100 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }} onClick={() => window.scrollTo(0,0)}>
+          <div style={{ border: `2px solid ${gold}`, padding: '5px 12px', fontWeight: '900', fontSize: '24px' }}>N</div>
+          <span style={{ letterSpacing: '5px', fontSize: '20px', fontWeight: 'bold' }}>NJP GLOBAL</span>
         </div>
         
-        <div className="hidden md:flex gap-8 items-center font-medium text-[10px] tracking-[0.3em] uppercase">
-          <button onClick={scrollToJobs} className="hover:text-white transition">Jobs</button>
-          <button className="hover:text-white transition">Post Opportunity</button>
-          <button className="hover:text-white transition">Contact</button>
+        <div style={{ display: 'flex', gap: '30px', fontSize: '12px', fontWeight: 'bold', letterSpacing: '2px' }}>
+          <button onClick={scrollToJobs} style={{ background: 'none', border: 'none', color: gold, cursor: 'pointer' }}>JOBS</button>
+          <button style={{ background: 'none', border: 'none', color: gold, cursor: 'pointer' }}>POST OPPORTUNITY</button>
         </div>
 
-        <div className="flex gap-4 items-center">
-          <button onClick={() => setAuthModal('login')} className="text-[#d4af37] hover:text-white text-xs font-bold uppercase tracking-widest">Login</button>
-          <button onClick={() => setAuthModal('register')} className="bg-[#d4af37] text-black px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white transition-all">Register</button>
+        <div style={{ display: 'flex', gap: '20px' }}>
+          <button onClick={() => setAuthModal('login')} style={{ background: 'none', border: 'none', color: gold, cursor: 'pointer', fontWeight: 'bold' }}>LOGIN</button>
+          <button onClick={() => setAuthModal('register')} style={{ backgroundColor: gold, color: 'black', border: 'none', padding: '10px 25px', fontWeight: 'bold', cursor: 'pointer' }}>REGISTER</button>
         </div>
       </nav>
 
       {/* HERO SECTION */}
-      <header className="py-32 px-6 text-center">
-        <h2 className="text-6xl md:text-8xl font-serif mb-8 text-white leading-tight animate-in fade-in slide-in-from-bottom duration-700">The Gold Standard <br/> <span className="text-[#d4af37]">of Careers</span></h2>
-        <div className="max-w-2xl mx-auto flex flex-col md:flex-row gap-2 p-2 bg-[#161616] border border-[#d4af37]/20 shadow-2xl">
+      <header style={{ textAlign: 'center', padding: '120px 20px', background: 'linear-gradient(to bottom, #111, #0a0a0a)' }}>
+        <h1 style={{ fontSize: '70px', color: 'white', marginBottom: '20px', letterSpacing: '-2px' }}>Elite Global <span style={{ color: gold }}>Careers</span></h1>
+        <p style={{ letterSpacing: '5px', color: '#888', marginBottom: '40px' }}>THE GOLD STANDARD OF RECRUITMENT</p>
+        
+        <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', border: `1px solid ${gold}44`, backgroundColor: '#161616' }}>
           <input 
             type="text" 
-            placeholder="Search Global Positions..." 
-            className="flex-1 bg-transparent px-6 py-4 outline-none text-white placeholder:text-gray-700 text-lg"
+            placeholder="Search Premium Positions..." 
+            style={{ flex: 1, padding: '20px', background: 'transparent', border: 'none', color: 'white', outline: 'none' }}
             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
           />
-          <button onClick={scrollToJobs} className="bg-[#d4af37] text-black px-12 py-4 font-black uppercase text-sm hover:bg-white transition-all">Search</button>
+          <button onClick={scrollToJobs} style={{ backgroundColor: gold, color: 'black', border: 'none', padding: '0 40px', fontWeight: '900', cursor: 'pointer' }}>FIND</button>
         </div>
       </header>
 
-      <div id="job-section" className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 p-8 mb-20">
-        {/* SIDEBAR */}
-        <aside className="md:col-span-3 space-y-12">
-          <div className="border-l-2 border-[#d4af37]/40 pl-6">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.5em] mb-8 text-gray-500">Categories</h3>
-            <div className="flex flex-col gap-5 items-start">
-              {["All", "Tech", "Design", "Marketing", "Finance"].map(cat => (
-                <button key={cat} onClick={() => {setFilters({...filters, category: cat}); setCurrentPage(1);}}
-                  className={`text-xs uppercase tracking-[0.2em] transition-all hover:translate-x-2 ${filters.category === cat ? 'text-[#d4af37] font-black' : 'text-gray-600'}`}>
-                  {cat}
-                </button>
-              ))}
-            </div>
+      {/* MAIN CONTENT */}
+      <div id="job-section" style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: '250px 1fr', gap: '50px', padding: '50px 20px' }}>
+        
+        {/* SIDEBAR FILTERS */}
+        <aside style={{ borderLeft: `1px solid ${gold}33`, paddingLeft: '20px' }}>
+          <h3 style={{ fontSize: '12px', letterSpacing: '3px', color: '#555', marginBottom: '20px' }}>CATEGORIES</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {["All", "Tech", "Design", "Marketing", "Finance"].map(cat => (
+              <button key={cat} onClick={() => {setFilters({...filters, category: cat}); setCurrentPage(1);}}
+                style={{ background: 'none', border: 'none', color: filters.category === cat ? gold : '#555', textAlign: 'left', cursor: 'pointer', fontWeight: filters.category === cat ? 'bold' : 'normal', fontSize: '14px' }}>
+                {cat.toUpperCase()}
+              </button>
+            ))}
           </div>
         </aside>
 
-        {/* JOB FEED */}
-        <main className="md:col-span-9 space-y-6">
-          {currentJobs.map(job => (
-            <div key={job.id} onClick={() => setSelectedJob(job)} className="group bg-[#111] border border-white/5 p-10 flex flex-col md:flex-row justify-between items-center hover:border-[#d4af37]/40 transition-all cursor-pointer shadow-xl">
-              <div className="flex gap-8 items-center">
-                <div className="w-20 h-20 border border-[#d4af37]/10 flex items-center justify-center text-3xl font-serif text-[#d4af37] group-hover:bg-[#d4af37] group-hover:text-black transition-all">
-                  {job.company[0]}
+        {/* JOB LISTINGS */}
+        <main>
+          <div style={{ marginBottom: '20px', fontSize: '12px', color: '#555', letterSpacing: '2px' }}>{filteredJobs.length} POSITIONS FOUND</div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {currentJobs.map(job => (
+              <div key={job.id} onClick={() => setSelectedJob(job)} className="job-card-hover"
+                style={{ backgroundColor: '#111', padding: '30px', border: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', transition: '0.3s' }}>
+                <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+                  <div style={{ width: '60px', height: '60px', border: `1px solid ${gold}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: gold }}>{job.company[0]}</div>
+                  <div>
+                    <h3 style={{ color: 'white', margin: 0, fontSize: '22px' }}>{job.title}</h3>
+                    <p style={{ color: '#555', fontSize: '12px', marginTop: '5px', letterSpacing: '1px' }}>{job.company.toUpperCase()} // {job.location.toUpperCase()}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white group-hover:text-[#d4af37] transition-colors uppercase tracking-tighter">{job.title}</h3>
-                  <p className="text-gray-600 tracking-[0.2em] text-xs mt-1 uppercase">{job.company} // {job.location}</p>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{job.salary}</p>
+                  <span style={{ fontSize: '10px', color: gold, border: `1px solid ${gold}44`, padding: '2px 8px', borderRadius: '2px' }}>{job.type}</span>
                 </div>
               </div>
-              <div className="mt-6 md:mt-0 text-right flex flex-col items-end">
-                <p className="text-[#d4af37] font-serif text-2xl mb-3">{job.salary}</p>
-                <span className="text-[9px] border border-gray-800 px-4 py-1 tracking-[0.3em] uppercase text-gray-500 group-hover:border-[#d4af37]">Explore</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {/* PAGINATION */}
-          <div className="flex justify-center gap-10 mt-16 pt-10 border-t border-white/5 font-black text-[10px] tracking-[0.4em]">
-            <button onClick={() => setCurrentPage(p => p-1)} disabled={currentPage===1} className="disabled:opacity-20 hover:text-white">PREV</button>
-            <span className="text-white underline underline-offset-8 decoration-[#d4af37]">{currentPage} / {totalPages}</span>
-            <button onClick={() => setCurrentPage(p => p+1)} disabled={currentPage===totalPages} className="disabled:opacity-20 hover:text-white">NEXT</button>
-          </div>
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginTop: '50px', fontSize: '12px', fontWeight: 'bold' }}>
+              <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} style={{ background: 'none', border: 'none', color: gold, cursor: 'pointer', opacity: currentPage === 1 ? 0.2 : 1 }}>PREV</button>
+              <span style={{ color: 'white' }}>{currentPage} / {totalPages}</span>
+              <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} style={{ background: 'none', border: 'none', color: gold, cursor: 'pointer', opacity: currentPage === totalPages ? 0.2 : 1 }}>NEXT</button>
+            </div>
+          )}
         </main>
       </div>
 
-      {/* MODALS: JOB DETAIL, LOGIN, REGISTER */}
-      {selectedJob && (
-        <div className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-4 backdrop-blur-md">
-          <div className="bg-[#111] border border-[#d4af37] w-full max-w-2xl p-12 relative animate-in zoom-in duration-300">
-            <button onClick={() => setSelectedJob(null)} className="absolute top-8 right-8 text-[#d4af37] hover:text-white text-xl">✕</button>
-            <h2 className="text-5xl font-serif text-white mb-4 uppercase">{selectedJob.title}</h2>
-            <p className="text-[#d4af37] tracking-[0.3em] font-bold mb-10 text-xs">{selectedJob.company} // GLOBAL HQ</p>
-            <p className="text-gray-400 leading-loose text-lg mb-10">{selectedJob.desc}</p>
-            <button className="w-full bg-[#d4af37] text-black py-5 font-black uppercase tracking-[0.4em] hover:bg-white transition-all">Apply for position</button>
-          </div>
-        </div>
-      )}
-
+      {/* LOGIN/REGISTER MODAL */}
       {authModal && (
-        <div className="fixed inset-0 bg-black/95 z-[110] flex items-center justify-center p-4 backdrop-blur-xl">
-          <div className="bg-[#111] border border-[#d4af37]/30 w-full max-w-md p-12 relative shadow-[0_0_50px_rgba(212,175,55,0.1)]">
-            <button onClick={() => setAuthModal(null)} className="absolute top-8 right-8 text-gray-600 hover:text-[#d4af37]">✕</button>
-            
-            <h2 className="text-3xl font-serif text-white mb-8 text-center uppercase tracking-widest">
-              {authModal === 'login' ? 'Welcome Back' : 'Create Account'}
-            </h2>
-
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-              {authModal === 'register' && (
-                <input type="text" placeholder="FULL NAME" className="w-full bg-black border border-white/10 p-4 outline-none focus:border-[#d4af37] transition text-white placeholder:text-gray-800 text-xs tracking-widest" />
-              )}
-              <input type="email" placeholder="EMAIL ADDRESS" className="w-full bg-black border border-white/10 p-4 outline-none focus:border-[#d4af37] transition text-white placeholder:text-gray-800 text-xs tracking-widest" />
-              <input type="password" placeholder="PASSWORD" className="w-full bg-black border border-white/10 p-4 outline-none focus:border-[#d4af37] transition text-white placeholder:text-gray-800 text-xs tracking-widest" />
-              
-              <button className="w-full bg-[#d4af37] text-black py-4 font-black uppercase text-xs tracking-[0.3em] hover:bg-white transition-all">
-                {authModal === 'login' ? 'Secure Login' : 'Sign Up Now'}
-              </button>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 200 }}>
+          <div style={{ backgroundColor: '#111', border: `1px solid ${gold}`, padding: '50px', width: '400px', textAlign: 'center' }}>
+            <h2 style={{ color: 'white', marginBottom: '30px', letterSpacing: '5px' }}>{authModal.toUpperCase()}</h2>
+            <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {authModal === 'register' && <input type="text" placeholder="FULL NAME" style={{ padding: '15px', background: 'black', border: '1px solid #333', color: 'white', outline: 'none' }} />}
+              <input type="email" placeholder="EMAIL ADDRESS" style={{ padding: '15px', background: 'black', border: '1px solid #333', color: 'white', outline: 'none' }} />
+              <input type="password" placeholder="PASSWORD" style={{ padding: '15px', background: 'black', border: '1px solid #333', color: 'white', outline: 'none' }} />
+              <button style={{ backgroundColor: gold, color: 'black', padding: '15px', border: 'none', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' }}>CONTINUE</button>
             </form>
-
-            <p className="mt-8 text-center text-[10px] tracking-widest text-gray-600">
-              {authModal === 'login' ? "DON'T HAVE AN ACCOUNT?" : "ALREADY A MEMBER?"} 
-              <button onClick={() => setAuthModal(authModal === 'login' ? 'register' : 'login')} className="ml-2 text-[#d4af37] font-black hover:underline underline-offset-4 tracking-normal uppercase">
-                {authModal === 'login' ? 'Create one' : 'Login here'}
-              </button>
-            </p>
+            <button onClick={() => setAuthModal(null)} style={{ marginTop: '25px', background: 'none', border: 'none', color: '#555', cursor: 'pointer' }}>CLOSE</button>
           </div>
         </div>
       )}
 
-      <footer className="py-20 border-t border-white/5 text-center bg-black">
-        <p className="text-[10px] tracking-[1em] text-gray-700 uppercase">NJP Global Luxury Systems — Est. 2026</p>
+      {/* JOB DETAILS MODAL */}
+      {selectedJob && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.98)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 200 }}>
+          <div style={{ backgroundColor: '#111', border: `1px solid ${gold}`, padding: '60px', width: '100%', maxWidth: '800px', position: 'relative' }}>
+            <button onClick={() => setSelectedJob(null)} style={{ position: 'absolute', top: '30px', right: '30px', background: 'none', border: 'none', color: gold, fontSize: '20px', cursor: 'pointer' }}>✕</button>
+            <h2 style={{ fontSize: '40px', color: 'white', marginBottom: '10px' }}>{selectedJob.title}</h2>
+            <p style={{ color: gold, letterSpacing: '3px', fontWeight: 'bold', marginBottom: '40px' }}>{selectedJob.company.toUpperCase()} // {selectedJob.location.toUpperCase()}</p>
+            <div style={{ color: '#aaa', lineHeight: '1.8', fontSize: '18px', marginBottom: '40px' }}>{selectedJob.desc}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', borderTop: '1px solid #222', paddingTop: '30px' }}>
+              <div><p style={{ fontSize: '10px', color: '#555' }}>REWARD</p><p style={{ fontSize: '24px', fontWeight: 'bold' }}>{selectedJob.salary}</p></div>
+              <div><p style={{ fontSize: '10px', color: '#555' }}>TYPE</p><p style={{ fontSize: '24px', fontWeight: 'bold' }}>{selectedJob.type}</p></div>
+            </div>
+            <button style={{ width: '100%', backgroundColor: gold, color: 'black', padding: '20px', border: 'none', fontWeight: 'bold', fontSize: '18px', marginTop: '40px', cursor: 'pointer' }}>APPLY FOR THIS POSITION</button>
+          </div>
+        </div>
+      )}
+
+      <footer style={{ textAlign: 'center', padding: '80px', borderTop: '1px solid #111', fontSize: '10px', letterSpacing: '5px', color: '#333' }}>
+        © 2026 NJP GLOBAL SYSTEMS // LUXURY CAREER PORTAL
       </footer>
     </div>
   );
 };
 
-export default NJPGlobalFinal;
+export default App;
