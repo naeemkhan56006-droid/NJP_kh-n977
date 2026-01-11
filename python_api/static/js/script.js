@@ -14,6 +14,7 @@ const App = {
         this.cacheDOM();
         this.bindEvents();
         this.fetchJobs();
+        if (window.lucide) window.lucide.createIcons();
     },
 
     cacheDOM() {
@@ -60,20 +61,32 @@ const App = {
             job.company.toLowerCase().includes(this.state.filters.search.toLowerCase())
         );
 
-        this.dom.jobsGrid.innerHTML = filtered.map(job => `
-            <div class="job-card">
-                <h3 class="job-title">${job.title}</h3>
-                <div class="job-company">${job.company}</div>
-                <div class="job-tags">
-                    <span class="tag">${job.category || 'Professional'}</span>
-                    <span class="tag">${job.job_type || 'Full-time'}</span>
+        if (this.dom.jobsGrid) {
+            this.dom.jobsGrid.innerHTML = filtered.map(job => `
+            <div class="job-card fade-in">
+                <div class="job-header">
+                    <div class="company-logo-placeholder">${job.company.charAt(0)}</div>
+                    <div>
+                        <h3 class="job-title">${job.title}</h3>
+                        <div class="job-company"><i data-lucide="building-2" style="width:14px"></i> ${job.company}</div>
+                    </div>
                 </div>
+                
+                <div class="job-tags">
+                    <span class="tag"><i data-lucide="briefcase" style="width:12px"></i> ${job.category || 'Professional'}</span>
+                    <span class="tag"><i data-lucide="clock" style="width:12px"></i> ${job.job_type || 'Full-time'}</span>
+                </div>
+
                 <div class="job-footer">
                     <span class="salary-tag">${job.salary || 'Negotiable'}</span>
                     <button class="btn btn-primary btn-sm">Apply Now</button>
                 </div>
             </div>
         `).join('');
+
+            // Refresh Icons
+            if (window.lucide) window.lucide.createIcons();
+        }
     }
 };
 
