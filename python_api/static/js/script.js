@@ -1,6 +1,7 @@
 /**
- * NJP Global - Executive Script
- * Fixes: Null ClassList Error, Search Functionality, View Switching
+ * NJP Global - Core Application Script
+ * Handles: Real-time Search, View Switching, Job Grid Rendering
+ * Dependencies: auth.js, admin.js (loaded previously)
  */
 
 const App = {
@@ -11,10 +12,15 @@ const App = {
     },
 
     init() {
+        // Ensure Lucide icons are rendered initially
+        if (window.lucide) window.lucide.createIcons();
+
         this.cacheDOM();
         this.bindEvents();
         this.fetchJobs();
-        if (window.lucide) window.lucide.createIcons();
+
+        // Expose App for Admin.js to call
+        window.App = this;
     },
 
     cacheDOM() {
@@ -23,12 +29,11 @@ const App = {
             jobsGrid: document.getElementById('jobsGrid'),
             searchInput: document.getElementById('searchInput'),
             overlay: document.getElementById('modalOverlay'),
-            candidateTable: document.getElementById('candidateTable')
         };
     },
 
     bindEvents() {
-        // Search Filter Logic
+        // Real-time Search
         if (this.dom.searchInput) {
             this.dom.searchInput.addEventListener('input', (e) => {
                 this.state.filters.search = e.target.value;
@@ -36,7 +41,7 @@ const App = {
             });
         }
 
-        // Close modal on overlay click
+        // Global Overlay Click
         if (this.dom.overlay) {
             this.dom.overlay.addEventListener('click', () => window.closeAllModals());
         }
@@ -45,58 +50,81 @@ const App = {
     async fetchJobs() {
         try {
             const res = await fetch('/api/jobs');
+            if (!res.ok) throw new Error('API Error');
             const data = await res.json();
             this.state.jobs = data;
             this.renderJobsList();
         } catch (e) {
             console.error("Failed to fetch jobs:", e);
+            if (this.dom.jobsGrid) {
+                this.dom.jobsGrid.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted)">Unable to load opportunities at this time.</div>`;
+            }
         }
     },
 
     renderJobsList() {
         if (!this.dom.jobsGrid) return;
 
+        const term = this.state.filters.search.toLowerCase();
         const filtered = this.state.jobs.filter(job =>
-            job.title.toLowerCase().includes(this.state.filters.search.toLowerCase()) ||
-            job.company.toLowerCase().includes(this.state.filters.search.toLowerCase())
+            (job.title && job.title.toLowerCase().includes(term)) ||
+            (job.company && job.company.toLowerCase().includes(term))
         );
 
-        if (this.dom.jobsGrid) {
-            this.dom.jobsGrid.innerHTML = filtered.map(job => `
+        if (filtered.length === 0) {
+            this.dom.jobsGrid.innerHTML = `<div style="text-align:center; grid-column:1/-1; padding:20px;">No matches found</div>`;
+            return;
+        }
+
+        this.dom.jobsGrid.innerHTML = filtered.map(job => `
             <div class="job-card fade-in">
                 <div class="job-header">
-                    <div class="company-logo-placeholder">${job.company.charAt(0)}</div>
+                    <div class="company-logo-placeholder">${job.company ? job.company.charAt(0).toUpperCase() : 'N'}</div>
                     <div>
-                        <h3 class="job-title">${job.title}</h3>
-                        <div class="job-company"><i data-lucide="building-2" style="width:14px"></i> ${job.company}</div>
+                        <h3 class="job-title">${escapeHtml(job.title)}</h3>
+                        <div class="job-company">
+                            <i data-lucide="building-2" style="width:14px"></i> ${escapeHtml(job.company)}
+                        </div>
                     </div>
                 </div>
                 
                 <div class="job-tags">
-                    <span class="tag"><i data-lucide="briefcase" style="width:12px"></i> ${job.category || 'Professional'}</span>
-                    <span class="tag"><i data-lucide="clock" style="width:12px"></i> ${job.job_type || 'Full-time'}</span>
+                    <span class="tag tag-primary">
+                        <i data-lucide="briefcase" style="width:12px"></i> ${escapeHtml(job.category || 'Professional')}
+                    </span>
+                    <span class="tag tag-secondary">
+                        <i data-lucide="clock" style="width:12px"></i> ${escapeHtml(job.job_type || 'Full-time')}
+                    </span>
+                    <span class="tag tag-secondary">
+                         ${escapeHtml(job.location || 'Remote')}
+                    </span>
                 </div>
 
                 <div class="job-footer">
-                    <span class="salary-tag">${job.salary || 'Negotiable'}</span>
-                    <button class="btn btn-primary btn-sm">Apply Now</button>
+                    <span class="salary-tag">${escapeHtml(job.salary || 'Negotiable')}</span>
+                    <button class="btn btn-primary btn-sm" onclick="openApplyModal('${job.id}')">Apply Now</button>
                 </div>
             </div>
         `).join('');
 
-            // Refresh Icons
-            if (window.lucide) window.lucide.createIcons();
-        }
+        // Refresh icons for new elements
+        if (window.lucide) window.lucide.createIcons();
     }
 };
 
-// --- Global Functions (Bridging HTML to Logic) ---
+// --- Global Utilities (Used by auth.js, admin.js, index.html) ---
 
 window.showView = (viewName) => {
     App.state.view = viewName;
     document.querySelectorAll('.view-section').forEach(el => {
-        el.style.display = el.id === `${viewName}View` ? 'block' : 'none';
+        if (el.id === `${viewName}View`) {
+            el.style.display = 'block';
+            el.classList.add('fade-in'); // Add animation if CSS supports it
+        } else {
+            el.style.display = 'none';
+        }
     });
+    window.scrollTo(0, 0);
 };
 
 window.openModal = (modalId) => {
@@ -104,37 +132,50 @@ window.openModal = (modalId) => {
     const overlay = document.getElementById('modalOverlay');
 
     if (modal && overlay) {
-        window.closeAllModals(); // Close any open ones first
+        window.closeAllModals(); // Close trigger
+
         overlay.style.display = 'block';
         modal.style.display = 'block';
-        setTimeout(() => {
+
+        // Small delay to allow display:block to apply before adding class for transition
+        requestAnimationFrame(() => {
             overlay.classList.add('active');
             modal.classList.add('active');
-        }, 10);
+        });
     } else {
-        console.error("Modal or Overlay not found:", modalId);
+        console.error("Modal not found:", modalId);
     }
 };
 
 window.closeAllModals = () => {
-    // 1. Overlay
     const overlay = document.getElementById('modalOverlay');
-    if (overlay && overlay.classList) {
+    if (overlay) {
         overlay.classList.remove('active');
         setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 300);
     }
 
-    // 2. Modals (Strict Loop as Requested)
-    const modals = document.querySelectorAll('.modal-content');
-    if (modals) {
-        modals.forEach(modal => {
-            if (modal && modal.classList) {
-                modal.classList.remove('active');
-                setTimeout(() => { if (modal) modal.style.display = 'none'; }, 300);
-            }
-        });
-    }
+    document.querySelectorAll('.modal-content').forEach(modal => {
+        modal.classList.remove('active');
+        setTimeout(() => { if (modal) modal.style.display = 'none'; }, 300);
+    });
 };
 
-// Initialize the App
+// Simple ID safe HTML escaping
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+window.openApplyModal = (jobId) => {
+    // Placeholder for Apply Modal Logic if not in auth.js
+    // Just opening the modal for now as requested
+    // If apply logic is needed, it can be added here
+    console.log("Applying for", jobId);
+    alert("Application feature coming soon in this modular update!");
+};
+
+// Initialize
 document.addEventListener('DOMContentLoaded', () => App.init());
