@@ -250,6 +250,7 @@ h6 {
 
 .hero h1 span {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -397,10 +398,10 @@ h6 {
 
 .job-card:hover {
     border-color: var(--primary);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.2);
-    /* Deep shadow + Gold Glow */
-    transform: translateY(-8px);
-    /* Weightless LIFT */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(212, 175, 55, 0.25);
+    /* Enhanced Golden Glow */
+    transform: translateY(-10px);
+    /* User requested -10px Lift */
 }
 
 .job-header {
@@ -428,6 +429,8 @@ h6 {
 }
 
 .job-title {
+    font-family: 'Playfair Display', serif;
+    /* Explicitly ensure Luxury Font */
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 8px;
