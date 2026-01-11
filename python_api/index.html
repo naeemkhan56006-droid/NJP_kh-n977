@@ -16,7 +16,8 @@
     <nav class="navbar">
         <div class="container nav-content">
             <div class="logo">
-                <i data-lucide="briefcase" style="color: var(--primary);"></i>
+                <img src="/static/img/logo.png" alt="NJP Logo"
+                    style="height: 48px; width: 48px; border: 1px solid var(--primary); padding: 4px; object-fit: contain;">
                 NJP <span>Global</span>
             </div>
             <div class="nav-links">
@@ -48,6 +49,10 @@
                     <div class="search-field">
                         <i data-lucide="search"></i>
                         <input type="text" id="searchInput" placeholder="Job title, keywords, or company...">
+                    </div>
+                    <div class="search-field" style="flex: 0.8;">
+                        <i data-lucide="map-pin"></i>
+                        <input type="text" id="locationInput" placeholder="City or State...">
                     </div>
                     <div class="search-field">
                         <i data-lucide="layers"></i>

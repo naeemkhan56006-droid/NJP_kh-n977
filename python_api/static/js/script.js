@@ -108,6 +108,7 @@ async function loadJobs(filters = {}) {
         const params = new URLSearchParams();
 
         if (filters.search) params.append('search', filters.search);
+        if (filters.location) params.append('location', filters.location);
         if (filters.category) params.append('category', filters.category);
         if (filters.type) params.append('job_type', filters.type); // Fixed key matching backend
 
@@ -205,6 +206,8 @@ function setupSearch() {
     function executeSearch() {
         const filters = {
             search: searchInput.value,
+            search: searchInput.value,
+            location: document.getElementById('locationInput').value,
             category: categorySelect.value,
             type: typeSelect.value
         };
@@ -216,6 +219,11 @@ function setupSearch() {
     // Debounce input
     let timeout;
     searchInput.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(executeSearch, 500);
+    });
+
+    document.getElementById('locationInput').addEventListener('input', () => {
         clearTimeout(timeout);
         timeout = setTimeout(executeSearch, 500);
     });

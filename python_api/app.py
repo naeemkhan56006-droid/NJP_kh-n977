@@ -168,6 +168,10 @@ def handle_jobs():
         if jt:
             query = query.filter(Job.job_type == jt)
             
+        location = request.args.get('location')
+        if location:
+            query = query.filter(Job.location.ilike(f'%{location}%'))
+
         search = request.args.get('search')
         if search:
             search_pattern = f'%{search}%'
