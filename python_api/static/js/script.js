@@ -234,10 +234,7 @@ function setupLoginLegacy() {
     // Legacy placeholder, logic moved to setupModals -> setupLogin
 }
 
-function closeAllModals() {
-    document.getElementById('modalOverlay').classList.remove('active');
-    document.querySelectorAll('.modal-content').forEach(el => el.style.display = 'none');
-}
+// Duplicate closeAllModals removed. Using the one defined later in the file.
 
 window.openModal = function (modalId) {
     const overlay = document.getElementById('modalOverlay');
