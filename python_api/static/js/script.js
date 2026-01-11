@@ -64,21 +64,19 @@ const App = {
             };
         };
 
-        const debouncedSearch = debounce((e) => updateFilter('search', e.target.value), 100);
-        const debouncedLocation = debounce((e) => updateFilter('location', e.target.value), 100);
+        // Instant Search (No Debounce for "Bridge" feel)
+        this.dom.searchInput.addEventListener('input', (e) => updateFilter('search', e.target.value));
+        this.dom.locationInput.addEventListener('input', (e) => updateFilter('location', e.target.value));
 
-        this.dom.searchInput.addEventListener('input', debouncedSearch);
-        this.dom.locationInput.addEventListener('input', debouncedLocation);
         this.dom.categorySelect.addEventListener('change', (e) => updateFilter('category', e.target.value));
         this.dom.typeSelect.addEventListener('change', (e) => updateFilter('type', e.target.value));
 
         // Button Search (Instant, but keeps button for UX)
         this.dom.searchBtn.addEventListener('click', () => {
-            // Already reactive, maybe scroll to top?
             document.querySelector('.jobs-grid').scrollIntoView({ behavior: 'smooth' });
         });
 
-        setupModals(); // Keep modal logic separate but connected
+        setupModals();
     },
 
     // 3. State Management & Reactivity
@@ -646,9 +644,11 @@ function setupApplyForm() {
             });
 
             if (res.ok) {
-                showToast('Application submitted successfully!', 'success');
+                // showToast('Application submitted successfully!', 'success'); // Old toaster
                 closeAllModals();
                 form.reset();
+                openModal('successModal'); // New Golden Checkmark
+                if (window.lucide) lucide.createIcons();
             } else {
                 showToast('Failed to submit application.', 'error');
             }
