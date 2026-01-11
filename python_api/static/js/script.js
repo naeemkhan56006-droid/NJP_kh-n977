@@ -229,30 +229,9 @@ function setupModals() {
     setupLogin();
 }
 
-function setupLogin() {
-    const btn = document.getElementById('loginBtn');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-        const user = document.getElementById('loginUser').value;
-        const pass = document.getElementById('loginPass').value;
-
-        if (pass === 'admin123' || pass === 'njp123') {
-            // Admin Flow
-            localStorage.setItem('isAdmin', 'true');
-            App.state.isAdmin = true;
-            document.getElementById('navAdminLink').style.display = 'block';
-            showToast('Welcome Admin', 'success');
-            closeAllModals();
-            window.showView('admin');
-        } else if (user.toLowerCase().includes('employer')) {
-            // Simulated Employer Flow
-            showToast('Welcome Employer', 'success');
-            closeAllModals();
-            window.showView('employer');
-        } else {
-            showToast('Invalid credentials', 'error');
-        }
-    });
+// Replaced by specific setupLogin function inside setupModals to avoid duplication/confusion
+function setupLoginLegacy() {
+    // Legacy placeholder, logic moved to setupModals -> setupLogin
 }
 
 function closeAllModals() {
@@ -601,7 +580,7 @@ function setupSearch() {
 
 // Modals & Admin
 function setupModals() {
-    const overlay = document.getElementById('modalOverlay'); // Make sure this exists in HTML or handled
+    const overlay = document.getElementById('modalOverlay');
     const closeBtns = document.querySelectorAll('.modal-close');
 
     if (closeBtns) {
@@ -622,6 +601,53 @@ function setupModals() {
     setupApplyForm();
     setupJobForm();
     setupAdminLogin();
+    setupLogin(); // Ensure login setup is called
+}
+
+function setupLogin() {
+    const btn = document.getElementById('loginBtn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const userElem = document.getElementById('loginUser');
+        const passElem = document.getElementById('loginPass');
+
+        const user = userElem ? userElem.value : '';
+        const pass = passElem ? passElem.value : '';
+
+        if (pass === 'admin123' || pass === 'njp123') {
+            // Admin Flow
+            localStorage.setItem('isAdmin', 'true');
+            App.state.isAdmin = true;
+            const adminLink = document.getElementById('navAdminLink');
+            if (adminLink) adminLink.style.display = 'block';
+            showToast('Welcome Admin', 'success');
+            closeAllModals();
+            if (window.showView) window.showView('admin');
+        } else if (user.toLowerCase().includes('employer')) {
+            // Simulated Employer Flow
+            showToast('Welcome Employer', 'success');
+            closeAllModals();
+            if (window.showView) window.showView('employer');
+        } else {
+            // Try API Login for real users
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message === 'Login successful') {
+                        showToast('Login Successful', 'success');
+                        closeAllModals();
+                        // Determine view based on user type if needed
+                    } else {
+                        showToast(data.error || 'Invalid credentials', 'error');
+                    }
+                })
+                .catch(() => showToast('Login failed', 'error'));
+        }
+    });
 }
 
 function closeAllModals() {
@@ -731,13 +757,16 @@ function setupAdminLogin() {
     if (!btn) return;
 
     btn.addEventListener('click', () => {
-        const pass = document.getElementById('adminPass').value;
+        const passInput = document.getElementById('adminPass');
+        const pass = passInput ? passInput.value : '';
+
         if (pass === 'admin123' || pass === 'njp123') { // Simple client-side auth
             isAdmin = true;
             localStorage.setItem('isAdmin', 'true');
             showToast('Welcome back, Admin!', 'success');
             closeAllModals();
-            document.getElementById('navAdminLink').style.display = 'block';
+            const navAdmin = document.getElementById('navAdminLink');
+            if (navAdmin) navAdmin.style.display = 'block';
             showView('admin');
         } else {
             showToast('Invalid access code', 'error');

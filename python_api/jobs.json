@@ -1,92 +1,102 @@
 [
   {
-    "title": "Chief Executive Officer",
-    "company": "Golden Horizon Corp",
-    "location": "New York, NY",
-    "salary": "$450k - $800k",
+    "id": 1,
+    "title": "Chief Technology Officer",
+    "company": "TechGlobal Gov",
+    "location": "Islamabad, Pakistan",
+    "salary": "$180,000 - $220,000",
     "job_type": "Full-time",
-    "category": "Executive",
-    "description": "Lead a Fortune 500 company into the next era of global expansion. Requires visionary leadership and a track record of excellence."
+    "category": "Tech",
+    "description": "Lead the national digital transformation strategy. We are looking for a visionary CTO to oversee all technical aspects of the organization, ensuring alignment with business goals."
   },
   {
-    "title": "Global Strategy Director",
-    "company": "Aura Financial",
-    "location": "London, UK",
-    "salary": "$250k - $400k",
-    "job_type": "Full-time",
-    "category": "Finance",
-    "description": "Shape the financial future of global markets. Seeking a strategic mastermind with deep expertise in international banking."
-  },
-  {
+    "id": 2,
     "title": "VP of Engineering",
-    "company": "Nebula Tech",
-    "location": "San Francisco, CA",
-    "salary": "$300k - $550k",
+    "company": "CyberSecure Systems",
+    "location": "Lahore, Pakistan",
+    "salary": "$150,000 - $190,000",
     "job_type": "Full-time",
     "category": "Tech",
-    "description": "Oversee all technical operations for a cutting-edge AI firm. Must have experience scaling teams from 50 to 500+."
+    "description": "Manage a team of 100+ engineers delivering next-gen security protocols. You will be responsible for scaling the engineering team and driving technical excellence."
   },
   {
-    "title": "Senior Creative Director",
-    "company": "Muse Studios",
-    "location": "Paris, France",
-    "salary": "$180k - $250k",
-    "job_type": "Contract",
-    "category": "Design",
-    "description": "Define the visual identity of luxury brands. A portfolio demonstrating high-end aesthetic mastery is mandatory."
-  },
-  {
-    "title": "Head of Private Wealth",
-    "company": "Sovereign Bank",
-    "location": "Zurich, Switzerland",
-    "salary": "$350k - $600k",
-    "job_type": "Full-time",
-    "category": "Finance",
-    "description": "Manage ultra-high-net-worth portfolios with discretion and precision. Fluency in German and French preferred."
-  },
-  {
-    "title": "Chief Marketing Officer",
-    "company": "Velvet & Co.",
-    "location": "Milan, Italy",
-    "salary": "$280k - $450k",
-    "job_type": "Full-time",
-    "category": "Marketing",
-    "description": "Drive brand dominance in the fashion capital of the world. Experience with luxury fashion houses is a must."
-  },
-  {
-    "title": "Principal AI Architect",
-    "company": "Cognition Labs",
-    "location": "Remote",
-    "salary": "$220k - $380k",
+    "id": 3,
+    "title": "Director of Product",
+    "company": "FinEdge Solutions",
+    "location": "Karachi, Pakistan",
+    "salary": "$140,000 - $175,000",
     "job_type": "Remote",
-    "category": "Tech",
-    "description": "Architect the next generation of neural networks. A role for the intellectually fearless."
+    "category": "Finance",
+    "description": "Define the product roadmap for our premier fintech application. Seeking a leader with a strong background in financial technologies and user-centric design."
   },
   {
-    "title": "Director of Operations",
-    "company": "Apex Logistics",
-    "location": "Singapore",
-    "salary": "$200k - $320k",
+    "id": 4,
+    "title": "Head of AI Research",
+    "company": "NeuralNet Corp",
+    "location": "Islamabad, Pakistan",
+    "salary": "$200,000 - $250,000",
     "job_type": "Full-time",
-    "category": "Operations",
-    "description": "Streamline global supply chains for efficiency and speed. Requires a master logistician."
+    "category": "Tech",
+    "description": "Pioneer agentic AI models for government efficiency. You will lead a team of researchers pushing the boundaries of what's possible with artificial intelligence."
   },
   {
-    "title": "General Counsel",
-    "company": "Orion Energy",
-    "location": "Houston, TX",
-    "salary": "$300k - $500k",
+    "id": 5,
+    "title": "Chief Financial Officer",
+    "company": "GreenEnergy Holdings",
+    "location": "Dubai, UAE",
+    "salary": "$220,000 - $300,000",
+    "job_type": "Contract",
+    "category": "Finance",
+    "description": "Oversee financial operations for a multi-national renewable energy firm. Requires extensive experience in global finance and strategic planning."
+  },
+  {
+    "id": 6,
+    "title": "Senior Legal Counsel",
+    "company": "Global Trade Partners",
+    "location": "London, UK",
+    "salary": "$160,000 - $210,000",
     "job_type": "Full-time",
     "category": "Legal",
-    "description": "Navigate complex international energy regulations. Protect the firm's interests globally."
+    "description": "Provide expert legal guidance on international trade regulations. You will be the primary legal advisor for complex cross-border transactions."
   },
   {
-    "title": "Luxury Real Estate Broker",
-    "company": "Estate Privé",
-    "location": "Dubai, UAE",
-    "salary": "Commission Only ($500k+ OTE)",
+    "id": 7,
+    "title": "Chief Marketing Officer",
+    "company": "BrandPrime",
+    "location": "New York, USA",
+    "salary": "$190,000 - $240,000",
+    "job_type": "Remote",
+    "category": "Marketing",
+    "description": "Drive global brand strategy and market penetration. We need a creative powerhouse to elevate our brand to new heights on the world stage."
+  },
+  {
+    "id": 8,
+    "title": "Principal Solutions Architect",
+    "company": "CloudScale Inc.",
+    "location": "Singapore",
+    "salary": "$170,000 - $200,000",
     "job_type": "Full-time",
-    "category": "Real Estate",
-    "description": "Connect elite buyers with the world's most exclusive properties. Unmatched networking skills required."
+    "category": "Tech",
+    "description": "Design scalable cloud infrastructure for enterprise clients. You will work closely with clients to architect robust and secure cloud solutions."
+  },
+  {
+    "id": 9,
+    "title": "Director of Operations",
+    "company": "LogisticsOne",
+    "location": "Karachi, Pakistan",
+    "salary": "$130,000 - $160,000",
+    "job_type": "Full-time",
+    "category": "Operations",
+    "description": "Streamline supply chain operations for maximum efficiency. You will be responsible for optimizing logistics and ensuring timely delivery of goods."
+  },
+  {
+    "id": 10,
+    "title": "Lead UX/UI Designer",
+    "company": "CreativeMinds Studio",
+    "location": "Remote",
+    "salary": "$120,000 - $150,000",
+    "job_type": "Contract",
+    "category": "Design",
+    "description": "Craft award-winning digital experiences for luxury brands. We are seeking a designer with a pixel-perfect eye and a passion for user experience."
   }
 ]
