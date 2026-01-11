@@ -648,13 +648,36 @@ function setupLogin() {
 }
 
 function closeAllModals() {
+    // 1. Overlay Logic (Defensive)
     const overlay = document.getElementById('modalOverlay');
-    if (overlay) {
+    if (overlay && overlay.classList) {
         overlay.classList.remove('active');
     }
-    const modals = document.querySelectorAll('.modal-content');
-    if (modals) {
-        modals.forEach(el => el.style.display = 'none');
+
+    // 2. Defensive Specific ID Check (User Requested)
+    const modalIds = [
+        'loginModal',
+        'registerModal',
+        'applyModalContent',
+        'successModal',
+        'postJobModalContent',
+        'loginModalContent'
+    ];
+
+    modalIds.forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.style.display = 'none';
+            if (modal.classList) modal.classList.remove('active', 'show');
+        }
+    });
+
+    // 3. Catch-all for class-based modals
+    const genericModals = document.querySelectorAll('.modal-content');
+    if (genericModals) {
+        genericModals.forEach(el => {
+            if (el) el.style.display = 'none';
+        });
     }
 }
 
@@ -674,6 +697,11 @@ function openModal(modalId) {
     }
 
     modal.style.display = 'block';
+
+    // Add Fade-In Animation Class dynamically
+    modal.classList.remove('fade-in');
+    void modal.offsetWidth; // Trigger reflow
+    modal.classList.add('fade-in');
 
     // Animation trigger for success modal
     if (modalId === 'successModal') {
