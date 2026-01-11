@@ -1,27 +1,92 @@
 [
-  { "id": 1, "title": "Frontend Developer", "company": "TechFlow", "category": "Tech", "type": "Remote", "salary": "$80k", "location": "USA", "desc": "Expert in React and Tailwind CSS." },
-  { "id": 2, "title": "Senior UI Designer", "company": "Pixel Perfect", "category": "Design", "type": "Full-time", "salary": "$70k", "location": "UK", "desc": "Master of Figma and Design Systems." },
-  { "id": 3, "title": "Backend Engineer", "company": "DataNode", "category": "Tech", "type": "Remote", "salary": "$95k", "location": "Canada", "desc": "Node.js and MongoDB specialist." },
-  { "id": 4, "title": "SEO Manager", "company": "RankBoost", "category": "Marketing", "type": "Contract", "salary": "$40k", "location": "Remote", "desc": "Growth hacking and organic search expert." },
-  { "id": 5, "title": "Full Stack Dev", "company": "NJP Systems", "category": "Tech", "type": "Full-time", "salary": "$110k", "location": "Germany", "desc": "MERN Stack expert with 5 years experience." },
-  { "id": 6, "title": "Financial Analyst", "company": "Goldman Tech", "category": "Finance", "type": "Full-time", "salary": "$85k", "location": "UAE", "desc": "Expert in data modeling and financial planning." },
-  { "id": 7, "title": "Product Designer", "company": "Innovate", "category": "Design", "type": "Remote", "salary": "$75k", "location": "France", "desc": "Focus on mobile app user experience." },
-  { "id": 8, "title": "Content Strategist", "company": "WriteUp", "category": "Marketing", "type": "Part-time", "salary": "$30k", "location": "USA", "desc": "Manage blog and social media content." },
-  { "id": 9, "title": "Cloud Architect", "company": "SkyNet", "category": "Tech", "type": "Full-time", "salary": "$130k", "location": "Singapore", "desc": "AWS and Azure cloud infrastructure." },
-  { "id": 10, "title": "Investment Banker", "company": "Capital Trust", "category": "Finance", "type": "Full-time", "salary": "$150k", "location": "New York", "desc": "M&A and corporate finance expert." },
-  { "id": 11, "title": "React Native Dev", "company": "Appify", "category": "Tech", "type": "Remote", "salary": "$85k", "location": "Pakistan", "desc": "Build cross-platform mobile apps." },
-  { "id": 12, "title": "Brand Manager", "company": "LuxBrand", "category": "Marketing", "type": "Full-time", "salary": "$65k", "location": "Italy", "desc": "Develop and maintain brand identity." },
-  { "id": 13, "title": "Python Developer", "company": "AI Core", "category": "Tech", "type": "Remote", "salary": "$90k", "location": "Global", "desc": "Work on machine learning models." },
-  { "id": 14, "title": "Graphic Designer", "company": "Vector Pro", "category": "Design", "type": "Contract", "salary": "$45k", "location": "India", "desc": "Logo and brand asset creation." },
-  { "id": 15, "title": "Tax Consultant", "company": "Audit Pros", "category": "Finance", "type": "Full-time", "salary": "$70k", "location": "Australia", "desc": "Corporate tax filing and planning." },
-  { "id": 16, "title": "DevOps Engineer", "company": "BuildBot", "category": "Tech", "type": "Remote", "salary": "$105k", "location": "USA", "desc": "CI/CD pipeline management." },
-  { "id": 17, "title": "Social Media Lead", "company": "Viral Lab", "category": "Marketing", "type": "Full-time", "salary": "$50k", "location": "Spain", "desc": "Execute viral marketing campaigns." },
-  { "id": 18, "title": "Motion Designer", "company": "Animate It", "category": "Design", "type": "Remote", "salary": "$60k", "location": "Global", "desc": "Create high-quality motion graphics." },
-  { "id": 19, "title": "QA Engineer", "company": "TestX", "category": "Tech", "type": "Full-time", "salary": "$75k", "location": "Canada", "desc": "Automated and manual testing." },
-  { "id": 20, "title": "Accountant", "company": "Ledger Plus", "category": "Finance", "type": "Contract", "salary": "$55k", "location": "UK", "desc": "Maintain accounts and audit reports." },
-  { "id": 21, "title": "Data Scientist", "company": "BigData", "category": "Tech", "type": "Remote", "salary": "$120k", "location": "Global", "desc": "Statistical analysis and data visualization." },
-  { "id": 22, "title": "Illustrator", "company": "Ink & Paper", "category": "Design", "type": "Part-time", "salary": "$35k", "location": "Remote", "desc": "Digital and hand-drawn illustrations." },
-  { "id": 23, "title": "E-commerce Expert", "company": "Shopify Pro", "category": "Marketing", "type": "Full-time", "salary": "$60k", "location": "USA", "desc": "Manage large-scale online stores." },
-  { "id": 24, "title": "Portfolio Manager", "company": "Wealth Wise", "category": "Finance", "type": "Full-time", "salary": "$115k", "location": "Japan", "desc": "Manage assets for high-net-worth clients." },
-  { "id": 25, "title": "Cybersecurity Specialist", "company": "Shield IT", "category": "Tech", "type": "Remote", "salary": "$110k", "location": "Global", "desc": "Protect network and data systems." }
+  {
+    "title": "Chief Executive Officer",
+    "company": "Golden Horizon Corp",
+    "location": "New York, NY",
+    "salary": "$450k - $800k",
+    "job_type": "Full-time",
+    "category": "Executive",
+    "description": "Lead a Fortune 500 company into the next era of global expansion. Requires visionary leadership and a track record of excellence."
+  },
+  {
+    "title": "Global Strategy Director",
+    "company": "Aura Financial",
+    "location": "London, UK",
+    "salary": "$250k - $400k",
+    "job_type": "Full-time",
+    "category": "Finance",
+    "description": "Shape the financial future of global markets. Seeking a strategic mastermind with deep expertise in international banking."
+  },
+  {
+    "title": "VP of Engineering",
+    "company": "Nebula Tech",
+    "location": "San Francisco, CA",
+    "salary": "$300k - $550k",
+    "job_type": "Full-time",
+    "category": "Tech",
+    "description": "Oversee all technical operations for a cutting-edge AI firm. Must have experience scaling teams from 50 to 500+."
+  },
+  {
+    "title": "Senior Creative Director",
+    "company": "Muse Studios",
+    "location": "Paris, France",
+    "salary": "$180k - $250k",
+    "job_type": "Contract",
+    "category": "Design",
+    "description": "Define the visual identity of luxury brands. A portfolio demonstrating high-end aesthetic mastery is mandatory."
+  },
+  {
+    "title": "Head of Private Wealth",
+    "company": "Sovereign Bank",
+    "location": "Zurich, Switzerland",
+    "salary": "$350k - $600k",
+    "job_type": "Full-time",
+    "category": "Finance",
+    "description": "Manage ultra-high-net-worth portfolios with discretion and precision. Fluency in German and French preferred."
+  },
+  {
+    "title": "Chief Marketing Officer",
+    "company": "Velvet & Co.",
+    "location": "Milan, Italy",
+    "salary": "$280k - $450k",
+    "job_type": "Full-time",
+    "category": "Marketing",
+    "description": "Drive brand dominance in the fashion capital of the world. Experience with luxury fashion houses is a must."
+  },
+  {
+    "title": "Principal AI Architect",
+    "company": "Cognition Labs",
+    "location": "Remote",
+    "salary": "$220k - $380k",
+    "job_type": "Remote",
+    "category": "Tech",
+    "description": "Architect the next generation of neural networks. A role for the intellectually fearless."
+  },
+  {
+    "title": "Director of Operations",
+    "company": "Apex Logistics",
+    "location": "Singapore",
+    "salary": "$200k - $320k",
+    "job_type": "Full-time",
+    "category": "Operations",
+    "description": "Streamline global supply chains for efficiency and speed. Requires a master logistician."
+  },
+  {
+    "title": "General Counsel",
+    "company": "Orion Energy",
+    "location": "Houston, TX",
+    "salary": "$300k - $500k",
+    "job_type": "Full-time",
+    "category": "Legal",
+    "description": "Navigate complex international energy regulations. Protect the firm's interests globally."
+  },
+  {
+    "title": "Luxury Real Estate Broker",
+    "company": "Estate Privé",
+    "location": "Dubai, UAE",
+    "salary": "Commission Only ($500k+ OTE)",
+    "job_type": "Full-time",
+    "category": "Real Estate",
+    "description": "Connect elite buyers with the world's most exclusive properties. Unmatched networking skills required."
+  }
 ]

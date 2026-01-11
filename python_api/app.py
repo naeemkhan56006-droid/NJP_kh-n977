@@ -109,17 +109,54 @@ with app.app_context():
         db.session.add_all(sample_news)
         print("Added sample news")
     
-    # Richer Sample Jobs
-    if Job.query.count() == 0:
-        sample_jobs = [
-            Job(title="Senior Cloud Architect", company="Nebula Systems", location="Remote", salary="$180k - $240k", job_type="Full-time", category="Tech", description="Lead our global cloud migration strategy. You will be responsible for designing resilient architectures and managing multi-cloud deployments.", requirements="10+ years AWS/GCP experience. Strong leadership skills.", benefits="Remote first, stock options, premium health coverage."),
-            Job(title="UX/UI Designer", company="Pixel Perfect", location="New York, NY", salary="$120k", job_type="Full-time", category="Design", description="Create delightful experiences for our next-gen mobile app. Focus on user-centric design principles and accessibility.", requirements="Strong portfolio with Figma skills. Experience with mobile apps.", benefits="Creative studio access, annual performance bonus."),
-            Job(title="Finance Analyst", company="Goldman Sage", location="London, UK", salary="£90k", job_type="Contract", category="Finance", description="High-stakes financial modeling and trend analysis. Assist in quarterly planning and strategic investment evaluations.", requirements="CFA Level 2 preferred. Mastery of Excel and SQL.", benefits="High day rate, networking with industry leaders."),
-            Job(title="Growth Marketer", company="Viral Edge", location="Austin, TX", salary="$110k", job_type="Full-time", category="Marketing", description="Scale our user base through data-driven campaigns. Manage a multi-channel acquisition strategy and optimize ROAS.", requirements="Experience with SQL and Meta Ads. A/B testing expertise.", benefits="Flexible hours, modern office in downtown Austin."),
-            Job(title="Junior Developer", company="CodeStart", location="Remote", salary="$70k", job_type="Remote", category="Tech", description="Support our engineering team in building internal tools. Learn from senior mentors while contributing to production code.", requirements="Python or JavaScript knowledge. Degree in CS or equivalent experience.", benefits="Professional mentorship, annual learning budget.")
+    # Create tables
+    db.create_all()
+
+    # Seed data if empty
+    if not Job.query.first():
+        print("Seeding database from jobs.json...")
+        
+        try:
+            import json
+            import os
+            
+            # Load jobs from JSON file
+            json_path = os.path.join(os.path.dirname(__file__), 'jobs.json')
+            if os.path.exists(json_path):
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    jobs_data = json.load(f)
+                    
+                for job_data in jobs_data:
+                    job = Job(
+                        title=job_data['title'],
+                        company=job_data['company'],
+                        location=job_data['location'],
+                        salary=job_data['salary'],
+                        job_type=job_data['job_type'],
+                        category=job_data['category'],
+                        description=job_data['description']
+                    )
+                    db.session.add(job)
+                
+                db.session.commit()
+                print(f"Added {len(jobs_data)} premium jobs from jobs.json")
+            else:
+                print("jobs.json not found, skipping job seeding.")
+                
+        except Exception as e:
+            print(f"Error seeding jobs: {e}")
+
+    # Seed News (Keep existing simple logic or update if needed)
+    if not News.query.first():
+        news_items = [
+            News(title="Global Hiring Surge", content="Top firms are expanding remotely."),
+            News(title="AI in Executive Search", content="How AI is matching elite talent.")
         ]
-        db.session.add_all(sample_jobs)
-        print("Added sample jobs")
+        db.session.add_all(news_items)
+        db.session.commit()
+        print("Added sample news")
+
+    print("Database seeding completed")
 
     db.session.commit()
     print("Database seeding completed")

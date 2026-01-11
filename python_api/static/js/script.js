@@ -223,7 +223,33 @@ function setupModals() {
 
     setupApplyForm();
     setupJobForm();
-    setupAdminLogin();
+    setupLogin();
+}
+
+function setupLogin() {
+    const btn = document.getElementById('loginBtn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const user = document.getElementById('loginUser').value;
+        const pass = document.getElementById('loginPass').value;
+
+        if (pass === 'admin123' || pass === 'njp123') {
+            // Admin Flow
+            localStorage.setItem('isAdmin', 'true');
+            App.state.isAdmin = true;
+            document.getElementById('navAdminLink').style.display = 'block';
+            showToast('Welcome Admin', 'success');
+            closeAllModals();
+            window.showView('admin');
+        } else if (user.toLowerCase().includes('employer')) {
+            // Simulated Employer Flow
+            showToast('Welcome Employer', 'success');
+            closeAllModals();
+            window.showView('employer');
+        } else {
+            showToast('Invalid credentials', 'error');
+        }
+    });
 }
 
 function closeAllModals() {
@@ -437,7 +463,9 @@ async function loadCandidates() {
                     <div style="font-size: 0.85rem; color: var(--text-muted);">Applied: ${new Date(app.applied_at).toLocaleDateString()}</div>
                 </td>
                 <td style="padding: 16px;">
-                    <span class="status-badge ${app.status.toLowerCase()}">${app.status}</span>
+                     <span class="status-badge ${app.status.toLowerCase()}" style="border: 1px solid var(--border-gold); padding: 4px 12px; border-radius: 20px;">
+                        ${app.status === 'Hired' ? '🌟 ' + app.status : app.status}
+                    </span>
                 </td>
                 <td style="padding: 16px; text-align: right;">
                     <select onchange="updateStatus(${app.id}, this.value)" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text-main);">
@@ -524,60 +552,7 @@ async function loadStats() {
 }
 
 // Rendering
-function renderJobs(jobs) {
-    const grid = document.getElementById('jobsGrid');
-    grid.innerHTML = '';
 
-    if (jobs.length === 0) {
-        grid.innerHTML = `
-            <div class="no-results" style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                <h3>No jobs found</h3>
-                <p class="text-muted">Try adjusting your search criteria</p>
-            </div>
-        `;
-        return;
-    }
-
-    jobs.forEach(job => {
-        const card = document.createElement('div');
-        card.className = 'job-card';
-        card.innerHTML = `
-            <div>
-                <div class="job-header">
-                    <div class="company-logo-placeholder">
-                        ${job.company.substring(0, 2).toUpperCase()}
-                    </div>
-                    <button class="btn btn-ghost btn-sm" onclick="shareJob(${job.id})">
-                        <i class="lucide-share-2"></i>
-                    </button>
-                </div>
-                
-                <h3 class="job-title">${job.title}</h3>
-                <div class="job-company">
-                    <i data-lucide="building-2" style="width: 16px"></i>
-                    ${job.company}
-                </div>
-                
-                <div class="job-tags">
-                    <span class="tag tag-primary">${job.category || 'General'}</span>
-                    <span class="tag tag-secondary">${job.job_type || 'Full-time'}</span>
-                    <span class="tag tag-secondary">${job.location || 'Remote'}</span>
-                </div>
-            </div>
-
-            <div class="job-footer">
-                <span class="salary-tag">${job.salary || 'Negotiable'}</span>
-                <button class="btn btn-primary btn-sm" onclick="openApplyModal(${job.id}, '${escapeHtml(job.title)}')">
-                    Apply Now
-                </button>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-
-    // Re-run lucide icons
-    if (window.lucide) lucide.createIcons();
-}
 
 // Search & Filter
 function setupSearch() {

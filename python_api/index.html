@@ -21,13 +21,14 @@
                 NJP <span>Global</span>
             </div>
             <div class="nav-links">
-                <a href="#" class="nav-link" onclick="showView('user')">Find Jobs</a>
-                <a href="#" class="nav-link" onclick="showView('employer')">For Employers</a>
-                <a href="#" class="nav-link" id="navAdminLink" style="display: none;"
-                    onclick="showView('admin')">Dashboard</a>
+                <a href="#" class="nav-link" onclick="showView('user'); return false;">Find Jobs</a>
+                <a href="#" class="nav-link" onclick="showView('employer'); return false;">Employer Dashboard</a>
+                <a href="#" class="nav-link" id="navAdminLink" onclick="showView('admin'); return false;"
+                    style="display: none;">Admin</a>
             </div>
             <div class="nav-cta">
-                <button class="btn btn-ghost" onclick="openModal('loginModalContent')">Member Login</button>
+                <button class="btn btn-ghost" onclick="openModal('loginModal')">Login</button>
+                <button class="btn btn-primary" onclick="openModal('registerModal')">Register</button>
             </div>
         </div>
     </nav>
@@ -194,113 +195,157 @@
         </div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal-overlay" id="modalOverlay">
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal-content" style="display: none;">
         <div class="modal">
-            <!-- Apply Modal -->
-            <div id="applyModalContent" class="modal-content" style="display:none;">
-                <div class="modal-header">
-                    <h3 id="modalJobTitle">Apply for Job</h3>
-                    <button class="modal-close"><i data-lucide="x"></i></button>
-                </div>
-                <div class="modal-body">
-                    <form id="applyForm">
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-input" id="applicantName" required placeholder="John Doe">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-input" id="applicantEmail" required
-                                placeholder="john@example.com">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Resume / Portfolio URL</label>
-                            <input type="url" class="form-input" placeholder="https://linkedin.com/in/john">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Cover Letter</label>
-                            <textarea class="form-input" rows="4"
-                                placeholder="Tell us why you're a great fit..."></textarea>
-                        </div>
-                        <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
-                            <button type="button" class="btn btn-ghost modal-close">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit Application</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="modal-header">
+                <h3>Login</h3>
+                <button class="modal-close"><i data-lucide="x"></i></button>
             </div>
-
-            <!-- Login Modal -->
-            <div id="loginModalContent" class="modal-content" style="display:none;">
-                <div class="modal-header">
-                    <h3>Admin Member Login</h3>
-                    <button class="modal-close"><i data-lucide="x"></i></button>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Email / Username</label>
+                    <input type="text" class="form-input" id="loginUser" placeholder="admin123 or employer">
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Access Code</label>
-                        <input type="password" class="form-input" id="adminPass" placeholder="Enter code (njp123)">
-                    </div>
-                    <button class="btn btn-primary" style="width: 100%;" id="adminLoginBtn">Login</button>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPass" placeholder="******">
                 </div>
+                <button class="btn btn-primary" style="width: 100%;" id="loginBtn">Sign In</button>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+                    Admin Code: <code>njp123</code> or <code>admin123</code>
+                </p>
             </div>
-
-            <!-- Post Job Modal -->
-            <div id="postJobModalContent" class="modal-content" style="display:none;">
-                <div class="modal-header">
-                    <h3>Post New Opportunity</h3>
-                    <button class="modal-close"><i data-lucide="x"></i></button>
-                </div>
-                <div class="modal-body">
-                    <form id="postJobForm">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div class="form-group">
-                                <label class="form-label">Job Title</label>
-                                <input id="jobTitle" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Company</label>
-                                <input id="jobCompany" class="form-input" required>
-                            </div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div class="form-group">
-                                <label class="form-label">Category</label>
-                                <select id="jobCategory" class="form-input">
-                                    <option>Tech</option>
-                                    <option>Finance</option>
-                                    <option>Marketing</option>
-                                    <option>Design</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Type</label>
-                                <select id="jobType" class="form-input">
-                                    <option>Full-time</option>
-                                    <option>Contract</option>
-                                    <option>Remote</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Location</label>
-                            <input id="jobLocation" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Salary</label>
-                            <input id="jobSalary" class="form-input" placeholder="e.g. $100k - $120k">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea id="jobDesc" class="form-input" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Post Job</button>
-                    </form>
-                </div>
-            </div>
-
         </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal-content" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Register</h3>
+                <button class="modal-close"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" placeholder="Create a password">
+                </div>
+                <button class="btn btn-primary" style="width: 100%;">Create Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Apply Modal -->
+    <div id="applyModalContent" class="modal-content" style="display:none;">
+        <div class="modal-header">
+            <h3 id="modalJobTitle">Apply for Job</h3>
+            <button class="modal-close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="applyForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="applicantName" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" id="applicantEmail" required placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Resume / Portfolio URL</label>
+                    <input type="url" class="form-input" placeholder="https://linkedin.com/in/john">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cover Letter</label>
+                    <textarea class="form-input" rows="4" placeholder="Tell us why you're a great fit..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
+                    <button type="button" class="btn btn-ghost modal-close">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModalContent" class="modal-content" style="display:none;">
+        <div class="modal-header">
+            <h3>Admin Member Login</h3>
+            <button class="modal-close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Access Code</label>
+                <input type="password" class="form-input" id="adminPass" placeholder="Enter code (njp123)">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" id="adminLoginBtn">Login</button>
+        </div>
+    </div>
+
+    <!-- Post Job Modal -->
+    <div id="postJobModalContent" class="modal-content" style="display:none;">
+        <div class="modal-header">
+            <h3>Post New Opportunity</h3>
+            <button class="modal-close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="postJobForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Job Title</label>
+                        <input id="jobTitle" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Company</label>
+                        <input id="jobCompany" class="form-input" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="jobCategory" class="form-input">
+                            <option>Tech</option>
+                            <option>Finance</option>
+                            <option>Marketing</option>
+                            <option>Design</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="jobType" class="form-input">
+                            <option>Full-time</option>
+                            <option>Contract</option>
+                            <option>Remote</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input id="jobLocation" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Salary</label>
+                    <input id="jobSalary" class="form-input" placeholder="e.g. $100k - $120k">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="jobDesc" class="form-input" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Post Job</button>
+            </form>
+        </div>
+    </div>
+
+    </div>
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
