@@ -60,10 +60,19 @@ class Application(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(20), default='Applied') # Applied, Review, Interview, Offer, Rejected
     applied_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
-        return {"name": self.name, "email": self.email, "job_id": self.job_id, "applied_at": self.applied_at.isoformat()}
+        return {
+            "id": self.id,
+            "name": self.name, 
+            "email": self.email, 
+            "job_id": self.job_id, 
+            "status": self.status,
+            "applied_at": self.applied_at.isoformat(),
+            "job_title": self.job.title if self.job else "Unknown" # Include job details
+        }
 
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -193,6 +202,30 @@ def get_apps():
     try:
         apps = Application.query.order_by(Application.applied_at.desc()).all()
         return jsonify([a.to_dict() for a in apps]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/candidates', methods=['GET'])
+def get_candidates():
+    try:
+        # Get all applications for the employer view
+        apps = Application.query.order_by(Application.applied_at.desc()).all()
+        return jsonify([a.to_dict() for a in apps]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/applications/<int:id>/status', methods=['PUT'])
+def update_status(id):
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+        if not new_status:
+            return jsonify({"error": "Status is required"}), 400
+            
+        app_record = Application.query.get_or_404(id)
+        app_record.status = new_status
+        db.session.commit()
+        return jsonify(app_record.to_dict()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

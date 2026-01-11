@@ -24,6 +24,73 @@ function showView(viewName) {
 
     if (viewName === 'admin') {
         loadAdminStats();
+    } else if (viewName === 'employer') {
+        loadCandidates();
+    }
+}
+
+// Employer Logic
+async function loadCandidates() {
+    const tbody = document.getElementById('candidateTable');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Loading candidates...</td></tr>';
+
+    try {
+        const res = await fetch('/api/candidates');
+        const apps = await res.json();
+
+        if (apps.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">No candidates found yet.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = apps.map(app => `
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 16px;">
+                    <div style="font-weight: 600; color: var(--text-main);">${escapeHtml(app.name)}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">${escapeHtml(app.email)}</div>
+                </td>
+                <td style="padding: 16px;">
+                    <div style="color: var(--primary); font-weight: 500;">${escapeHtml(app.job_title)}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Applied: ${new Date(app.applied_at).toLocaleDateString()}</div>
+                </td>
+                <td style="padding: 16px;">
+                    <span class="status-badge ${app.status.toLowerCase()}">${app.status}</span>
+                </td>
+                <td style="padding: 16px; text-align: right;">
+                    <select onchange="updateStatus(${app.id}, this.value)" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface); color: var(--text-main);">
+                        <option value="Applied" ${app.status === 'Applied' ? 'selected' : ''}>Applied</option>
+                        <option value="Review" ${app.status === 'Review' ? 'selected' : ''}>Review</option>
+                        <option value="Interview" ${app.status === 'Interview' ? 'selected' : ''}>Interview</option>
+                        <option value="Offer" ${app.status === 'Offer' ? 'selected' : ''}>Offer</option>
+                        <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                    </select>
+                </td>
+            </tr>
+        `).join('');
+
+    } catch (e) {
+        console.error("Error loading candidates", e);
+        tbody.innerHTML = '<tr><td colspan="4" style="color: red; text-align:center;">Error loading data</td></tr>';
+    }
+}
+
+async function updateStatus(appId, newStatus) {
+    try {
+        const res = await fetch(`/api/applications/${appId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (res.ok) {
+            showToast(`Status updated to ${newStatus}`, 'success');
+            loadCandidates(); // Refresh to update badge
+        } else {
+            showToast('Failed to update status', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Error updating status', 'error');
     }
 }
 
