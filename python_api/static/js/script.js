@@ -590,18 +590,22 @@ function setupSearch() {
 
 // Modals & Admin
 function setupModals() {
-    const overlay = document.getElementById('modalOverlay');
+    const overlay = document.getElementById('modalOverlay'); // Make sure this exists in HTML or handled
     const closeBtns = document.querySelectorAll('.modal-close');
 
-    closeBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            closeAllModals();
+    if (closeBtns) {
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                closeAllModals();
+            });
         });
-    });
+    }
 
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) closeAllModals();
-    });
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeAllModals();
+        });
+    }
 
     // Forms
     setupApplyForm();
