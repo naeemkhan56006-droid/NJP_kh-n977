@@ -65,16 +65,21 @@ const App = {
         };
 
         // Instant Search (No Debounce for "Bridge" feel)
-        this.dom.searchInput.addEventListener('input', (e) => updateFilter('search', e.target.value));
-        this.dom.locationInput.addEventListener('input', (e) => updateFilter('location', e.target.value));
+        // Instant Search (No Debounce for "Bridge" feel)
+        if (this.dom.searchInput) this.dom.searchInput.addEventListener('input', (e) => updateFilter('search', e.target.value));
+        if (this.dom.locationInput) this.dom.locationInput.addEventListener('input', (e) => updateFilter('location', e.target.value));
 
-        this.dom.categorySelect.addEventListener('change', (e) => updateFilter('category', e.target.value));
-        this.dom.typeSelect.addEventListener('change', (e) => updateFilter('type', e.target.value));
+        if (this.dom.categorySelect) this.dom.categorySelect.addEventListener('change', (e) => updateFilter('category', e.target.value));
+        if (this.dom.typeSelect) this.dom.typeSelect.addEventListener('change', (e) => updateFilter('type', e.target.value));
 
         // Button Search (Instant, but keeps button for UX)
-        this.dom.searchBtn.addEventListener('click', () => {
-            document.querySelector('.jobs-grid').scrollIntoView({ behavior: 'smooth' });
-        });
+        // Button Search (Instant, but keeps button for UX)
+        if (this.dom.searchBtn) {
+            this.dom.searchBtn.addEventListener('click', () => {
+                const grid = document.querySelector('.jobs-grid');
+                if (grid) grid.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
 
         setupModals();
     },
@@ -558,34 +563,40 @@ function setupSearch() {
     const categorySelect = document.getElementById('categorySelect');
     const typeSelect = document.getElementById('typeSelect');
     const searchBtn = document.getElementById('searchBtn');
+    const locationInput = document.getElementById('locationInput');
 
     function executeSearch() {
         const filters = {
-            search: searchInput.value,
-            search: searchInput.value,
-            location: document.getElementById('locationInput').value,
-            category: categorySelect.value,
-            type: typeSelect.value
+            search: searchInput ? searchInput.value : '',
+            location: locationInput ? locationInput.value : '',
+            category: categorySelect ? categorySelect.value : '',
+            type: typeSelect ? typeSelect.value : ''
         };
         loadJobs(filters);
     }
 
-    searchBtn.addEventListener('click', executeSearch);
+    if (searchBtn) {
+        searchBtn.addEventListener('click', executeSearch);
+    }
 
     // Debounce input
     let timeout;
-    searchInput.addEventListener('input', () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(executeSearch, 500);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(executeSearch, 500);
+        });
+    }
 
-    document.getElementById('locationInput').addEventListener('input', () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(executeSearch, 500);
-    });
+    if (locationInput) {
+        locationInput.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(executeSearch, 500);
+        });
+    }
 
-    categorySelect.addEventListener('change', executeSearch);
-    typeSelect.addEventListener('change', executeSearch);
+    if (categorySelect) categorySelect.addEventListener('change', executeSearch);
+    if (typeSelect) typeSelect.addEventListener('change', executeSearch);
 }
 
 // Modals & Admin
